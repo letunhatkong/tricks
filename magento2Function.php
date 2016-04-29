@@ -6,6 +6,7 @@ sudo bin/magento setup:static-content:deploy
 
 <!-- CLEAR CACHE -->
 Go to magento folder and type: php bin/magento cache:clean
+sudo bin/magento cache:clean
 
 <!-- Upgrade -->
 sudo bin/magento setup:upgrade
@@ -20,6 +21,8 @@ Remove all related tabel, and remove module in setup_module table
 sudo bin/magento module:uninstall Magentostudy_News --backup-code --backup-media --backup-db --clear-static-content
 <!-- Disable Module -->
 sudo bin/magento module:disable Magentostudy_News
+<!-- Enable Module -->
+php bin/magento module:enable Sahy_Banner --clear-static-content
 
 <!-- GET BASE URL -->
 <?php 
@@ -234,7 +237,8 @@ sudo composer install
 cd to /var/www/html and type: sudo chown -R www-data:www-data magento-folder
 cd to magento folder and type:
 
-sudo find . -type d -exec chmod 775 {} \; && sudo find . -type f -exec chmod 664 {} \; && sudo chmod u+x bin/magento; 
+sudo find . -type d -exec chmod 775 {} \; && sudo find . -type f -exec chmod 664 {} \; && sudo chmod -R 777 bin/magento var/ pub/ app/etc/ app/design/frontend/; 
+
 sudo chmod -R 777 var/ pub/ app/etc/
 
 sudo chmod -R 777 var/ pub/ app/etc/ app/design/frontend/ .idea/ .git/ .gitignore 
