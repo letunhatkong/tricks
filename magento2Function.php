@@ -239,6 +239,7 @@ cd to magento folder and type:
 
 sudo find . -type d -exec chmod 775 {} \; && sudo find . -type f -exec chmod 664 {} \; && sudo chmod -R 777 bin/magento var/ pub/ app/etc/ app/design/frontend/; 
 
+sudo chmod -R 777 bin/magento var/ pub/ app/etc/ app/design/frontend/; 
 sudo chmod -R 777 var/ pub/ app/etc/
 
 sudo chmod -R 777 var/ pub/ app/etc/ app/design/frontend/ .idea/ .git/ .gitignore 
@@ -246,9 +247,10 @@ sudo chmod -R 777 var/ pub/ app/etc/ app/design/frontend/ .idea/ .git/ .gitignor
 
 8/ Go to http://localhost/project-name/setup/
 
-
-
 UPDATE mytable    SET column1 = value1, column2 = value2 WHERE key_value = some_value;
 
 
 
+sudo service mysql stop
+sudo /etc/init.d/apparmor reload
+sudo service mysql start 
