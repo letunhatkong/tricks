@@ -1,0 +1,57 @@
+global
+    log         127.0.0.1 local0
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     10000
+    user        haproxy
+    group       haproxy
+    daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 10000
+#---------------------------------------------------------------------
+# Monitor
+#---------------------------------------------------------------------
+listen status
+    bind 0.0.0.0:9000
+    mode http
+    stats enable
+    stats uri /haproxy?stats
+    stats realm HAProxy\ Statistics
+    stats auth huyhyperss:huongthujjss
+
+#---------------------------------------------------------------------
+# main frontend which proxys to the backends
+#---------------------------------------------------------------------
+frontend HyperProxy
+    bind 0.0.0.0:80
+
+    default_backend         app
+#---------------------------------------------------------------------
+# round robin balancing between the various backends
+#---------------------------------------------------------------------
+backend app
+  balance roundrobin
+  option forwardfor
+  option http-server-close
+  #appsession JSESSIONID len 52 timeout 3h
+  server s1 113.171.23.18:80 check inter 2000
+  server s2 113.171.23.19:80 check inter 2000

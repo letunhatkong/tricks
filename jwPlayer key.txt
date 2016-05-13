@@ -1,0 +1,12 @@
+Key Premium
+jwplayer.key="f+Wss9Mq3asJ+95/nKrSoFEMc5KrHGD/lrgBJLO50GY="
+ jwplayer("avID_AVPlayerID_7e135454_2114707601").setup({
+  "file": "rtmp://123.30.134.108:1935/live/nctlive",
+  "height": "380",
+  "width": "560",
+                "autostart": "true",
+     "stretching":"fill","allowfullsreen":"true",
+"image":"http://radio-vietnam.weebly.com/uploads/1/3/5/1/1351818/4994676_orig.jpg",
+
+ });
+Key ADs: N8zhkmYvvRwOhz4aTGkySoEri4x+9pQwR7GHIQ= (thêm 1 dấu = vào cuối key)

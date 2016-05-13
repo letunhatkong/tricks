@@ -1,0 +1,14 @@
+Create file: name.desktop and edit file with gedit
+
+[Desktop Entry]
+Version=1.0
+Name=GrooveNet (app name)
+Comment=Launch GrooveNet
+Exec=/Downloads/GrooveNet-master/project/bin/groovenet (file link)
+Icon=/path/to/icon.png (icon link)
+Terminal=true (or false)
+Type=Application
+Categories=Utility;Application;
+
+Rename file to *.desktop
+Right click -> Properties -> permissions -> Check Allow executing file as program

@@ -1,0 +1,669 @@
+SETUP YII with WAMPP
+
+1/ copy file from http://www.yiiframework.com/download to c:\wamp\www folder
+rename yii-1.1.13.... folder to yii
+(c:\wamp\www\yii and the framework itself will be into c:\wamp\www\yii\framework)
+
+2/ on c:\wamp\www creates a file with the extension 'bat' (for example myrun.bat),
+then open it and put below code:
+
+set PATH=%PATH%;C:\wamp\bin\php\php5.4.3
+cmd
+
+3/ Run myrun.bat file and type (or you can cd to ..wamp/www/ folder and type)
+php yii/framework/yiic.php webapp myfirst
+
+
+4/ Config databases
+Create database MySQL and fix file
+protected/config/database.php
+
+5/ CRUD Create-Read-Update-Delete
+Edit file protected/config/main.php
+'gii'=>array(
+'class'=>'system.gii.GiiModule',
+'password'=>'1',
+// If removed, Gii defaults to localhost only. Edit carefully to taste.
+'ipFilters'=>array('127.0.0.1','::1'),
+)
+
+Go to http://localhost/myfirst/index.php?r=gii
+
+
+==== CONFIG APACHE ====
+Config virtualHost proxy in apache WAMP
+In config/httpd.conf, recomment httpd-vhotss.conf
+# Virtual hosts
+Include conf/extra/httpd-vhosts.conf
+
+In hosts file
+127.0.0.1       localhost
+127.0.0.1  mentor.vn
+
+In config/extra/httpd-vhosts.conf, add codes:
+Example: mentor.vn => localhost/mentor
+
+NameVirtualHost *:80
+<VirtualHost mentor.vn:80>
+    ServerAdmin mentor.vn
+    DirectoryIndex index.php
+    DocumentRoot "C:\wamp\www\mentor"
+    ServerName mentor.vn
+    ErrorLog "logs/mentor.com-error.log"
+    CustomLog "logs/mentor.com-access.log" common
+    <Directory
+    "C:\wamp\www\mentor">
+    Options Indexes FollowSymlinks
+    AllowOverride all
+    Order Allow,Deny
+    Allow from all
+    </Directory>
+</VirtualHost>
+
+
+CONFIG - UBUNTU
+/etc/apache2/sites-available/000-default.config
+
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
+    ServerName 127.0.1.1
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+
+/etc/apache2/sites-available/testhang.conf
+
+<VirtualHost www.testhang.com:80>
+    ServerAdmin www.testhang.com
+    DocumentRoot /var/www/html/testhang
+    ServerName www.testhang.com
+
+    <Directory
+    /var/www/html/testhang>
+    Allow from all
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride All
+    Order Allow,Deny
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/testhang-log.log
+    CustomLog ${APACHE_LOG_DIR}/testhang-access.log combined
+
+</VirtualHost>
+
+
+/etc/hosts
+127.0.0.1 localhost
+127.0.1.1 ubuntu
+127.0.1.1 www.testhang.com
+
+==== # APACHE2 =====
+
+
+<?php // Short function
+// Check request is Ajax
+Yii::app()->request->isAjaxRequest;
+
+// Get $_POST
+Yii::app()->request->getParam === $_POST;
+Yii::app()->request->getParam('Archives'); // $_POST['Archives']
+
+// Redirect link
+$this->redirect(Yii::app()->getBaseUrl() . "/archives");
+
+// Get WebRoot folder link
+Yii::getPathOfAlias('webroot'); // C:/wamp/www/mentor
+Yii::app()->homeUrl;
+Yii::app()->getBaseUrl();
+
+// Get Time now
+$time = new CDbExpression('NOW()');
+
+// Convert Date form database
+echo date('H:i d/m/Y', STRTOTIME($session['lastUpdate']));
+
+// Find by attributes
+$model = Users::model()->findByAttributes(array("username" => $username));
+
+// Count by attributes
+$checkUser = Users::model()->countByAttributes(array('username' => $username));
+
+// Delete all by atributes
+ArchiveSession::model()->deleteAllByAttributes(array(), 'idArchive = :id', array(":id" => $docId));
+
+// Find by PK
+$docPath = Archives::model()->findByPk((int)$docId);
+
+/**
+ * Action search User by username or email or firstName or lastName
+ */
+function actionSearchUser()
+{
+    $txtUser = Yii::app()->request->getParam('searchUser');
+    $txtUser = preg_replace('!\s+!', ' ', $txtUser);
+    $searchArr = array();
+    if (isset($txtUser) && trim($txtUser) !== "") {
+        $txtUser = ltrim($txtUser, " ");
+        $txtUser = rtrim($txtUser, " ");
+        array_push($searchArr, $txtUser);
+        foreach (explode(" ", $txtUser) as $item) array_push($searchArr, $item);
+    }
+
+    $result = array();
+    if (count($searchArr) > 0) {
+        foreach ($searchArr as $txt) {
+            $u = Users::model()->findByAttributes(array("username" => $txt));
+            if (is_null($u)) $u = Users::model()->findByAttributes(array("email" => $txt));
+            if (is_null($u)) $u = Users::model()->findByAttributes(array("firstName" => $txt));
+            if (is_null($u)) $u = Users::model()->findByAttributes(array("lastName" => $txt));
+            if (!is_null($u) && !in_array($u, $result)) {
+                array_push($result, $u);
+            }
+        }
+    }
+    $this->render('result', array('result' => $result));
+}
+
+/**
+ * Action get user data by id
+ */
+function actionGetUser()
+{
+    $userId = Yii::app()->request->getParam('id');
+    if (isset($userId) && $userId > 0) {
+        try {
+            $user = Users::model()->findByPk((int)$userId);
+            echo json_encode($user->attributes);
+        } catch (Exception $e) {
+            echo "false";
+        }
+    } else {
+        echo "false";
+    }
+}
+
+/**
+ * Action Remove user by id
+ */
+function actionRemoveUser()
+{
+    $userId = Yii::app()->request->getParam('id');
+    try {
+        Users::model()->deleteByPk($userId);
+    } catch (Exception $e) {
+        echo $e->getMessage();
+        exit;
+    }
+    $this->redirect(Yii::app()->getBaseUrl() . "/admin");
+}
+
+/**
+ *  Action Edit user
+ */
+function actionEditUser()
+{
+    $username = Yii::app()->request->getParam('usernameEdit');
+    if (isset($username) && !is_null($username)) {
+        try {
+            $model = Users::model()->findByAttributes(array("username" => $username));
+            $model->firstName = Yii::app()->request->getParam('firstNameEdit');
+            $model->lastName = Yii::app()->request->getParam('lastNameEdit');
+            $pass = Yii::app()->request->getParam('passwordEdit');
+            if (isset($pass) && $pass !== "") {
+                $model->password = $pass;
+            }
+            $model->email = Yii::app()->request->getParam('emailEdit');
+            $model->phone = Yii::app()->request->getParam('phoneEdit');
+            $model->gender = Yii::app()->request->getParam('genderEdit');
+            $oldAva = $model->avatarPath;
+
+            $avaFile = $_FILES['uploadAvatarEdit'];
+            if ($avaFile['error'] == 0) {
+                $path = Yii::getpathOfAlias('webroot') . Yii::app()->params["avatarFolderPath"] . '/';
+                if (isset($oldAva) && $oldAva !== "") {
+                    unlink($path . $oldAva);
+                }
+                move_uploaded_file($avaFile['tmp_name'], $path . $avaFile['name']);
+                $model->avatarPath = $avaFile['name'];
+            }
+            $model->save();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            exit;
+        }
+    }
+    $this->redirect(Yii::app()->getBaseUrl() . "/admin");
+}
+
+
+/**
+ * Get users Data on admin page
+ * @return array
+ */
+function getAdminData()
+{
+    $data = array();
+    $conn = Yii::app()->db;
+    $conn->active = true; // Start connect
+    $cmdGetUser = $conn->createCommand();
+    $cmdGetSession = $conn->createCommand();
+    $cmdGetArchiveSession = $conn->createCommand();
+    $cmdGetArchives = $conn->createCommand();
+
+    // Get users
+    $data['users'] = $cmdGetUser->select('*')
+        ->from('users')
+        ->query()
+        ->readALl();
+
+    // Get sessions
+    $data['sessions'] = $cmdGetSession->select('s.*, u.username, count(i.idInvitedSession) as countUser')
+        ->from('sessions s')
+        ->join('users u', 's.idUserCreate = u.idUser')
+        ->join('invited_session i', 's.idSession = i.idSession')
+        ->group('s.idSession')
+        ->order('s.idSession DESC')
+        ->query()
+        ->readALl();
+
+    // Get archives
+    $data['archives'] = $cmdGetArchives->select('*')
+        ->from('archives')
+        ->order('archives.idArchive DESC')
+        ->query()
+        ->readALl();
+
+    // Get Archive_session
+    $data['archiveSession'] = $cmdGetArchiveSession->select('*')
+        ->from('archive_session')
+        ->order('archive_session.idArchive DESC')
+        ->query()
+        ->readALl();
+
+    // Add sessions to archives by archive_session table
+    foreach ($data['archives'] as $key => $subArchive) {
+        $data['archives'][$key]['sessions'] = array();
+
+        foreach ($data['archiveSession'] as $subArSes) {
+            if ($subArSes['idArchive'] === $subArchive['idArchive']) {
+                try {
+                    $sData = Sessions::model()->findByPk($subArSes['idSession']);
+                    array_push($data['archives'][$key]['sessions'], $sData);
+                } catch (Exception $e) {
+                    echo $e->getMessage();
+                    exit;
+                }
+            }
+        }
+    }
+
+    // Add sessions to users
+    foreach ($data['users'] as $key => $subUser) {
+        $data['users'][$key]['sessions'] = array();
+        foreach ($data['sessions'] as $subSession) {
+            if ($subSession['idUserCreate'] === $subUser['idUser']) {
+                $sData = array(
+                    'idTopic' => $subSession['idTopic'],
+                    'title' => $subSession['title'],
+                    'active' => $subSession['active']
+                );
+                array_push($data['users'][$key]['sessions'], $sData);
+            }
+        }
+    }
+
+    $conn->active = false; // Close connect
+    return $data;
+}
+
+/**
+ * Yii: Insert new record to database - Cdbcommand
+ * Save to database
+ */
+function save()
+{
+    $conn = Yii::app()->db;
+    $conn->active = true; // Start connect
+    $command = $conn->createCommand();
+    $command->insert('archives', array(
+        'IdUserCreate' => $this->idUserCreate,
+        'Name' => $this->name,
+        'Path' => $this->path,
+        'DateCreate' => $this->dateCreate,
+    ));
+    $conn->active = false; // Close connect
+
+}
+
+/**
+ * Yii: Get all record by id - Cdbcommand Yii
+ * Get all record from archives table by IdUserCreate
+ * @param $id
+ * @return mixed
+ */
+function getAllByUserId($id)
+{
+    $conn = Yii::app()->db;
+    $conn->active = true; // Start connect
+    $command = $conn->createCommand();
+    $rows = $command->select('*')
+        ->from('archives')
+        ->where('IdUserCreate=:id', array(':id' => $id))
+        ->query();
+    $result = $rows->readAll();
+    $conn->active = false; // Close connect
+    return $result;
+}
+
+
+/**
+ * Class WebUser
+ * Yii: Add more information to Yii::app()->user - Yii Framework
+ * Create WebUser.php in .../protected/components
+ */
+class WebUser extends CWebUser
+{
+    public function __get($name)
+    {
+        if ($this->hasState('__userInfo')) {
+            $user = $this->getState('__userInfo', array());
+            if (isset($user[$name])) {
+                return $user[$name];
+            }
+        }
+
+        return parent::__get($name);
+    }
+
+    public function login($identity, $duration = 0)
+    {
+        $this->setState('__userInfo', $identity->getUser());
+        parent::login($identity, $duration);
+    }
+}
+
+?>
+
+
+
+<?php
+/**
+ * Yii: Redirect to another link before action controller is called - Yii
+ * Class AdminModule
+ */
+class AdminModule extends CWebModule
+{
+    public function init()
+    {
+        $this->setImport(array(
+            'admin.models.*',
+            'admin.components.*',
+        ));
+    }
+
+    public function beforeControllerAction($controller, $action)
+    {
+        if (parent::beforeControllerAction($controller, $action)) {
+            $userId = Yii::app()->user->id;
+            if (!isset($userId)) {
+                $controller->redirect('auth');
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+?>
+
+
+==========================================================================
+Kiến thức tổng quan Yii Framwork
+======== MODEL ========
++ Nên chứa các thuộc tính đại diện cho các dữ liệu cụ thể.
++ Nên chứa các business logic nhằm đảm bảo các dữ liệu đáp ứng được yêu cầu thiết kế
++ Có thể chứa các mã thao tác với database
++ Tránh sử dụng $_GET, $_POST hoặc các biến trực tiếp gắn liến với request của người dùng
++ Tránh nhúng các mã HTML hoặc các mã trình diễn khác (echo, …)
++ Model là 1 đối tượng của lớp CModel hoặc một class kế thừa CModel
++ Model dùng để giữ dữ liệu và những luật kinh doanh, thường là đại diện cho 1 row trong bảng table của database hoặc là 1 form input.
++ 1 Model tượng trưng cho 1 đối tượng dữ liệu độc lập
++ Yii implement 2 loại model: Form Model và Active Record. Cả 2 đều kế thừa từ CModel
++ Form Model là đối tượng của CFormModel. Form Model sử dụng để lưu trữ dữ liệu được thu thập từ form bởi user.
++ Active Record (AR) là kiểu design pattern sử dụng database trừu tượng để truy cập vào 1 kiểu hướng đối tượng. Đối tượng AR là đối tượng của CActiveRecord hoặc của một class con của class này, tượng trưng cho một hàng trong 1 bảng của database. Mỗi field trong hàng này tượng trưng cho thuộc tính của AR.
++ Khai báo những thuộc tính trong Model, ta khai báo những biến đó trong class atributeLabel() và nếu ta muốn save  chúng thì ta viết trong hàm afterSave. Ví dụ ta khai báo biến create_time thì ta code: $this->create_time = Tỉme();
++ Một vài phương thức liên quan đến truy vấn CSDL:
+# Protected Methods + # Events: beforSave() / afterSave(), beforeDelete() / afterDelete(), beforeValidate() / afterValidate(), beforFind() / afterFind().
+======== # MODEL =======
+
+======== VIEW ========-
++ Nên Chứa các mã  trình diễn, như HTML, PHP, ASP, đơn giản để thể định dạng dữ liệu
++ Có  thể  truy  cập  các  thuộc  tính  (property)  và  phương  thức  (method
+controller và model nhưng chỉ với mục đích trình bày.
++ Tránh chứa các mã truy vấn dữ liệu
++ Tránh truy cập trực tiếp đến $_GET, $_POST, hoặc các biến tương tự khác đại diện cho request của người dùng.
++ Trong view ta có thể sử dụng $this để đại diện cho đối tượng controller
++ Get thuộc tính trong view $this->properties.
++ Chúng ta có thể render thuộc tính như sau trong controller:
+$this->render(’edit’, array(
+’var1’=>$value1,
+’var2’=>$value2,
+)
++ Trong view ta sẽ gọi $var1 và $var2
++ Trong view ta gọi widget CListView
+widget('zii.widgets.CListView', array(
+'dataProvider'=>$dataProvider, // đưa mảng dữ liệu vào
+'itemView'=>' _view, // file _view.php trong views folder
+'template'=>"{items}\n{pager}",
+)); ?>
+
++ Các phương thức khi làm việc với view
+- render() : render a view with layout
+- renderDynamic() : render nội dung động được trả về từ 1 callback xác định.
+- renderFile() renderInternal(): render một file view.
+- renderPartial() : render một view.
+- renderText() : render một static text.
+- beforRender() + afterRender()
+======== # VIEW ========
+
+======== # CONTROLLER ========
++ Có thể  truy cập $_GET, $_POST và các biến tương tự khác đại diện cho request của người dùng.
++ Có thể tạo ra các thực thể (instance) của model.
++ Tránh code các câu lệnh truy vấn SQL hoặc code bất kỳ mã HTML hoặc các ngôn ngữ trình diễn khác.
+
+======== # CONTROLLER ========
+
+======== LAYOUT ========
++ Render 1 view không sử dụng bất cứ layout nào ta dùng renderPartial().
+
+WIDGET
++ Widget là 1 đối tượng của lớp CWidget hoặc lớp con của lớp CWidget
++ Cách gọi Widget
+beginWidget(’path.to.WidgetClass’); ?>
+...body content that may be captured by the widget..
+endWidget(); ?>
+or
+widget(’path.to.WidgetClass’); ?>
++ $this trong view của widget cũng được sử dụng để đại diện cho controller
+======== # LAYOUT ========
+
+
+======== COMPONENTS ========
++ Yii được xây dựng trên các component. Sử dụng các Component chủ yếu liên quan đến việc truy cập các thuộc tính của nó và nâng cao xử lí sự kiện. Component là đối tượng quản lí Event và Behavior.
++ Có 2 cách để khai báo properties Component.
+C1: mô tả biến public trong class kế thừa CComponent
+class Document extends CComponent { public $textWidth; }
+C2: dùng hàm get, set để khai báo
+
+
+
+COMPONENTS EVENT
++ Các method được gán trong một sự kiện sẽ được tự động thực thi mỗi khi sự kiện được
+gọi (raise)
++ Component event là 1 biến đặc biệt mà nó lấy 1 phương thức như là giá trị của chúng.
++ Khi event được gọi thì hàm tự động cũng được gọi.
++ Để khai báo một sự kiện trong component, ta phải khao báo một method bắt đầu bằng on ví dụ onClick()
+
+COMPONENTS BEHAVIOR
++ 1 component có thể hỗ trợ kiểu mixin và nó có thể được cố định với 1 hoặc 1 vài hành vi.
++ 1 hành vi là 1 đối tượng mà các mehods của nó có thể kế thừa bởi chính component gộp của chính hành vi đó, điều đó có nghĩa là nó thu thập chức năng thay thế cho việc chuyên môn hóa.
++ 1 component có thể được gán 1 vài hành vi (behavior), vì thế nó có thể đạt được tính đa kế thừa.
++ Những class behavior phải được implement từ interface IBehavior.
++ Để sử dụng 1 behavior, trước tiên nó phải được gán vào một component qua phươnng thức $component->attachBehavior($name, $behavior) sau đó ta có thể sử dụng phương thức của behavior thông qua component $component->methodBehavior()
+======== # COMPONENTS ========
+
+======== Data Access Object (DAO) ========
+DAO cung cấp một API chung để truy cập dữ liệu được lưu trữ trong hệ thống quản lý CSDL khác nhau.
+Yii DAO chủ yếu bao gồm 4 lớp (class) sau:
+1. CDbConnection: đại diện cho một kết nối đến CSDL
+2. CDbCommand: đại diện cho một câu lệnh truy vấn SQL để thực hiện trên CSDL
+3. CDbDataReader: đại diện  cho một  tập hợp các hàng (row) từ kết quả câu truy vấn
+4. CdbTransaction: đại diện cho một giao dịch (transaction) với DB.
+
+Thiết lập kết nối DB, ta tạo CdbConnection object như sau:
+$conn = new CDbConnection($dsn, $username, $password);
+$conn->active = true; // Start connect
+// Get data ....
+$conn->active =  false; // Close connect
+
+Danh sách các $dns cho mỗi database
++ SQLite = sqlite:/path/to/dbfile
++ MySQL = mysql:host=localhost;dbname=dbname;
++ PostgreSQL: pgsql:host=localhost;port=5432;dbname=testdb
++ SQL Server: mssql:host=localhost;dbname=testdb
++ Oracle: oci:dbname=//localhost:1521/testdb
+
+Nếu ta cấu hình DB trong file config/main thì ta truy cập DB connection như sau
+$conn = Yii::app()->db;
+Khi kết nối thành công các, ta sử dụng CDbCommand để truy vấn SQL.
+Ta dùng CDbConnection::createCommand()
+$command = CDbConnection::createCommand();
+$rowCount=$command->execute();   // execute the non-query SQL
+$dataReader=$command->query();   // execute a query SQL
+$rows=$command->queryAll();      // query and return all rows of result
+$row=$command->queryRow();       // query and return the first row of result
+$column=$command->queryColumn(); // query and return the first column of result
+$value=$command->queryScalar();  // query and return the first field in the first row
+
+Một câu lệnh CdbCommand được thực thi = 1 trong 2 cách sau:
+execute(): thực hiện non-query SQL, như INSERT, UPDATE và DELETE
+query(): thực hiện câu truy vấn trả về tập hợp các hàng (row) dữ liệu, như SELECT
+
+Lấy data ta sử dụng CdbDataReader()->read()
+$dataReader=$command->query();
+// calling read() repeatedly until it returns false
+while(($row=$dataReader->read())!==false) { ... }
+// using foreach to traverse through every row of data
+foreach($dataReader as $row) { ... }
+// retrieving all rows at once in a single array
+$rows=$dataReader->readAll();
+
+Using Transactions (Sử dụng transaction)
+Để sử dụng transaction (giao dịch) ta sử dụng cấu trúc như sau:
+$transaction=$connection->beginTransaction();
+try {
+$connection->createCommand($sql1)->execute();
+$connection->createCommand($sql2)->execute();
+//.... other SQL executions
+$transaction->commit();
+} catch(Exception $e) {
+// an exception is raised if a query fails
+$transaction->rollBack();
+}
+
+Truyền tham số vào câu truy vấn SQL
+// http://www.php.net/manual/en/pdostatement.bindparam.php
+// an SQL with two placeholders ":username" and ":email"
+$sql="INSERT INTO tbl_user (username, email) VALUES(:username,:email)";
+$command=$connection->createCommand($sql);
+// replace the placeholder ":username" with the actual username value
+$command->bindParam(":username",$username,PDO::PARAM_STR);
+// replace the placeholder ":email" with the actual email value
+$command->bindParam(":email",$email,PDO::PARAM_STR);
+$command->execute();
+// insert another row with a new set of parameters
+$command->bindParam(":username",$username2,PDO::PARAM_STR);
+$command->bindParam(":email",$email2,PDO::PARAM_STR);
+$command->execute()
+
+QUERY BUILDER
++ Yii Query Builder cung cấp việc viết các câu lệnh SQL theo hướng đối tượng. Nó cho
+phép sử dụng các phương thức và thuộc tính để chia nhỏ câu lệnh SQL thành các phần
+đơn giản hơn. Các phần đó  sau đó được Yii kết hợp  lại và  thực  thi  thông qua DAO.
+$user = Yii::app()->db->createCommand()
+->select('id, username, profile')
+->from('tbl_user u')
+->join('tbl_profile p', 'u.id=p.user_id')
+->where('id=:id', array(':id'=>$id))
+->queryRow();
+
++ Các phương thức liên quan đến Query Builder
+select(): specifies the SELECT part of the query
+selectDistinct(): specifies the SELECT part of the query and turns on the DISTINCT flag
+from(): specifies the FROM part of the query
+where(): specifies the WHERE part of the query
+join(): appends an inner join query fragment
+group(): specifies the GROUP BY part of the query
+having(): specifies the HAVING part of the query
+order(): specifies the ORDER BY part of the query
+limit(): specifies the LIMIT part of the query
+offset(): specifies the OFFSET part of the query
+union(): appends a UNION query fragment
+
+$users = Yii::app()->db->createCommand()
+->select('*')
+->from('tbl_user')
+->queryAll();
+
+$user = Yii::app()->db->createCommand()
+->select('id, username, profile')
+->from('tbl_user u')
+->join('tbl_profile p', 'u.id=p.user_id')
+->where('id=:id', array(':id'=>$id))
+->queryRow();
+
++ Thêm, sửa, xóa từ Jquery Builder
+insert(): thêm một hàng (row) vào 1 bảng (table)
+update(): trong một bảng
+delete(): xóa dữ liệu từ một bảng
+// build and execute the following SQL:
+// INSERT INTO `tbl_user` (`name`, `email`) VALUES (:name, :email)
+$command->insert('tbl_user', array(
+'name'=>'Tester',
+'email'=>'tester@example.com',
+));
+// build and execute the following SQL:
+// UPDATE `tbl_user` SET `name`=:name WHERE id=:id
+$command->update( 'tbl_user', array('name'=>'Tester',),
+'id=:id', array(':id'=>1) );
+
+
+// build and execute the following SQL:
+// DELETE FROM `tbl_user` WHERE id=:id
+$command->delete('tbl_user', 'id=:id', array(':id'=>1));
+
+
+======== # Data Access Object (DAO) ======
+
+======== FILTER function ========
++ Việc sử dụng dấu + - giúp ta chỉ rõ action nào là được thêm vào hoặc loại bớt
++ Ta có thể tùy biến sử dụng filter bằng cách sử dụng toán tử cộng (+) và trừ (-).
+Toán tử (+) cho phép filter đó chỉ được áp dụng đối với action kèm theo.
+Toán tử (-) cho phép filter đó được áp dụng cho tất cả các action ngoại trừ action kèm theo.
+======== # FILTER function ========
+
+======== STATIC PAGE ========
++ Vào views/site/pages/ tạo file staticpage.php
++ Sau đó truy cập url web.com/index.php/site/page?view=staticpage
+======== # STATIC PAGE ========
+
+======== Relationship
+BELONGS_TO: quan hệ giữa bảng A và B là 1 - nhiều, ví dụ bài viết thuộc user.
+HAS_MANY: A và B là 1 - nhiều, A có nhiều B. ví dụ 1 user viểt nhiều post.
+HAS_ONE: A và B là quan hệ 1 - 1, ví dụ 1 user chỉ có 1 profile.
+MANY_MANY: A và B là quan hệ nhiều - nhiều. Ví dụ post có nhiều category và categorry có thể có nhiều post.
+STAT: giúp thống kê
+======== Relationship

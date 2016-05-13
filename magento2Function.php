@@ -192,11 +192,31 @@ Save your changes and Restart Apache: sudo service apache2 restart
 sudo nano /etc/apache2/sites-available/magento.conf                    
 
 < Directory /var/www/html/magento >
+    Allow from all
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride All
+    Order allow,deny
+< /Directory >
+
+<VirtualHost siva.vn:80>
+    ServerAdmin siva@localhost
+    DocumentRoot /var/www/html/siva
+    ServerName siva.vn
+
+    <Directory /var/www/html/siva>
         Allow from all
         Options Indexes FollowSymLinks MultiViews
         AllowOverride All
         Order allow,deny
-< /Directory >
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/siva-log.log
+    CustomLog ${APACHE_LOG_DIR}/siva-access.log combined
+
+</VirtualHost>
+# sudo nano /etc/hosts
+127.0.1.1 siva.vn
+
 
 sudo a2ensite magento.conf 
 sudo service apache2 reload
@@ -204,7 +224,9 @@ sudo service apache2 restart
 
 5/ Create DATABASE
 mysql -u root -p
-CREATE DATABASE dowell;CREATE USER dwd@localhost IDENTIFIED BY 'Password$1';GRANT ALL PRIVILEGES ON dowell.* TO dwd@localhost IDENTIFIED BY 'Password$1';FLUSH PRIVILEGES;
+CREATE DATABASE siva;CREATE USER siva@localhost IDENTIFIED BY '1';
+GRANT ALL PRIVILEGES ON siva.* TO siva@localhost IDENTIFIED BY '1';
+FLUSH PRIVILEGES;
 exit
 
 6/ Autoload error - Vendor autoload is not found. Please run 'composer install' under application root directory.
@@ -239,18 +261,36 @@ cd to magento folder and type:
 
 sudo find . -type d -exec chmod 775 {} \; && sudo find . -type f -exec chmod 664 {} \; && sudo chmod -R 777 bin/magento var/ pub/ app/etc/ app/design/frontend/; 
 
-sudo chmod -R 777 bin/magento var/ pub/ app/etc/ app/design/frontend/; 
-sudo chmod -R 777 var/ pub/ app/etc/
+sudo find . -type d -exec chmod 777 {} \; && sudo find . -type f -exec chmod 664 {} \; && sudo chmod -R 777 bin/magento var/ pub/ app/etc/ app/design/frontend/; 
 
-sudo chmod -R 777 var/ pub/ app/etc/ app/design/frontend/ .idea/ .git/ .gitignore 
+sudo find . -type d -exec chmod 777 {} \; && sudo find . -type f -exec chmod 664 {} \; && sudo chmod -R 777 bin/magento var/ pub/ app/etc/ app/design/frontend/ .idea/ .git/ .gitignore;
 
 
 8/ Go to http://localhost/project-name/setup/
 
-UPDATE mytable    SET column1 = value1, column2 = value2 WHERE key_value = some_value;
+===== BUG MAGENTO ======
+Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock'
 
-
-
+Solution:
 sudo service mysql stop
 sudo /etc/init.d/apparmor reload
 sudo service mysql start 
+
+===== BUG MAGENTO ======
+[Exception] Missing write permissions to the following directories: pub/static folder - MAGENTO 2
+
+How to debug and fix:
+1) setup/src/Magento/Setup/Model/FilePermissions.php
+2) Goto line 143 in method checkRecursiveDirectories
+3) Add the lines var_dump($subDirectory);var_dump($subDirectory->isWritable()); return false;
+4) Re run bin/magento setup:upgrade
+
+Now you'll see what is really wrong, and you can fix it. Personally i remove everything in pub/static, this will be auto generated content so you should not be worried about that.
+
+
+
+
+
+
+
+

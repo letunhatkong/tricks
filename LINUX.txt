@@ -1,0 +1,218 @@
+
+
+Copy and Rsync in Linux
+Copy
+cp -avpr fromFolder toFolder
+-a : Preserve the specified attributes such as directory an file mode, ownership, timestamps, if possible additional attributes: context, links, xattr, all.
+-v : Explain what is being done.
+-r : Copy directories recursively.
+
+Rsync
+rsync -avz fromFolder toFolder
+-a : Archive mode i.e. copy a folder with all its permission and other information including recursive copy.
+-v : Verbose mode.
+-z : With this option, rsync compresses the file data as it is sent to the destination machine, which reduces the amount of data being transmitted — something that is useful over a slow connection.
+-P : View informations
+
+
+Config Nginx
+Edit file config
+
+sudo nano /etc/nginx/nginx.conf
+
+"worker_processes" defines how many concurrent processes that Nginx will use.
+
+In http block
+
+server { # simple reverse-proxy
+    listen       80;
+    server_name  domain2.com www.domain2.com;
+    access_log   logs/domain2.access.log  main;
+
+    # serve static files
+    location ~ ^/(images|javascript|js|css|flash|media|static)/  {
+      root    /var/www/virtual/big.server.com/htdocs;
+      expires 30d;
+    }
+
+    # pass requests for dynamic content to rails/turbogears/zope, et al
+    location / {
+      proxy_pass      http://127.0.0.1:8080;
+    }
+  }
+
+=======================================
+Command
+
+nodeJS + NPM install
+
+sudo apt-get install python-software-properties
+sudo apt-add-repository ppa:chris-lea/node.js
+sudo apt-get update
+sudo apt-get install nodejs
+node -v
+npm -v
+
+Or (Recommended):
+sudo apt-get install nodejs
+sudo apt-get install npm
+
+Check:
+node -v
+npm -v
+
+If you type "node -v" and receive a message: The program 'node' can be found in the following packages. Step by step:
+1. Run: which node
+and in my case it displayed /usr/sbin/node.
+2. If it says command not found, skip to 3. Remove it by
+sudo rm /usr/sbin/node
+3. Run: which nodejs
+in my case it displayed /usr/bin/nodejs
+4. Make a link
+sudo ln -s /usr/bin/nodejs /usr/bin/node
+OR
+sudo ln -s /usr/bin/nodejs /usr/sbin/node
+Re-check: node -v
+
+
+===========================================================
+Redis
+Reference: http://blog.chungkol.com/2014/03/nosql-how-to-install-redis-server-from.html
+
+Step 1. Before you install redis, there are a couple of prerequisites that need to be downloaded to make the installation as easy as possible:
+sudo apt-get update
+sudo apt-get install build-essential
+sudo apt-get install tcl8.5
+
+Step 2. Goto redis.io and get stable release version of redis
+sudo wget http://download.redis.io/releases/redis-2.8.17.tar.gz
+tar -xvf redis-2.8.17.tar.gz
+cd redis-2.8.17/src
+sudo make install
+
+Step 3. Install redis server by script
+cd ../utils
+sudo ./install_server.sh
+Enter ...
+
+Step 4. Start and stop redis services:
+sudo /etc/init.d/redis_6379 start
+sudo /etc/init.d/redis_6379 stop
+
+Step 5. Access to redis command line
+redis-cli
+Notes: if old redis is running, stop it before install.
+
+ redis-server --version
+
+===========================================================
+
+Redis-commander
+
+Step 0: If you dont' have NPM
+sudo apt-get install npm
+
+Install:
+sudo chown -R $USER /usr/local
+sudo npm install -g redis-commander
+
+redis-commander
+
+===========================================================
+MongoDB
+
+Install:
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+
+mongod --version
+
+Command
+sudo service mongod start
+sudo service mongod stop
+sudo service mongod restart
+
+Getting Started with MongoDB
+http://docs.mongodb.org/manual/tutorial/getting-started/
+The MongoDB instance stores its data files in /var/lib/mongodb and its log files in/var/log/mongodb by default, and runs using the mongodb user account. You can specify alternate log and data file directories in /etc/mongod.conf. See systemLog.path and storage.dbPath for additional information.
+If you change the user that runs the MongoDB process, you must modify the access control rights to the/var/lib/mongodb and /var/log/mongodb directories to give this user access to these directories.
+
+===========================================================
+Forever
+
+sudo npm install forever -g
+forever --version
+
+Start server
+
+node /data/HGTV/server.js
+forever start -a /data/HGTV/server.js
+forever stop -a /data/HGTV/server.js
+forever restart -a /data/HGTV/server.js
+
+===========================================================
+Maven
+
+sudo apt-get install maven
+mvn -v
+
+===========================================================
+Nginx
+
+sudo apt-get update
+sudo apt-get install nginx
+nginx -v
+
+sudo service nginx stop
+sudo service nginx start
+sudo service nginx restart
+
+We can make sure that our web server will restart automatically when the server is rebooted by typing:
+sudo update-rc.d nginx defaults
+
+This should already be enabled by default, so you may see a message like this:
+System start/stop links for /etc/init.d/nginx already exist.
+
+===========================================================
+PHP
+
+sudo apt-get update
+sudo apt-get install php5 php5-mhash php5-mcrypt php5-curl php5-cli php5-gd libcurl3 php5-intl php5-xsl php5-mysql
+php -v
+
+
+
+
+Hot Key Ubuntu
+New tab -> Ctrl+T
+New window -> Ctrl+N
+New folder -> Shift+Ctrl+N
+Open folder in new tab -> Shift+Return
+Properties -> Alt+Return
+Close window -> Ctrl+W
+Close all windows (quit) -> Ctrl+Q
+Make link -> Ctrl+M
+Add bookmark -> Ctrl+D
+Edit bookmarks -> Ctrl+B
+Undo -> Ctrl+Z
+Redo -> Ctrl+Y
+Cut -> Ctrl+X
+Copy -> Ctrl+C
+Paste -> Ctrl+V
+Select all -> Ctrl+A
+Select items matching -> Ctrl+S
+Invert selection -> Shift+Ctrl+I
+Show hidden files -> Ctrl+H
+Zoom in -> Ctrl++
+Zoom out -> Ctrl+-
+Normal size -> Ctrl+0
+List view -> Ctrl+1
+Icons view -> Ctrl+2
+Go to home directory -> Alt+Home
+Go to parent directory -> Alt+Up Arrow
+Go back -> Alt+Left Arrow
+Go forward -> Alt+Right Arrow
+Go to specified location -> Ctrl+L
+Search files (find) -> Ctrl+F

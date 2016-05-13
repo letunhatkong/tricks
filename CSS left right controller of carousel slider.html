@@ -1,0 +1,103 @@
+<div class="headSecHome">
+    <div>
+        <div class="lineSecHome"></div>
+        <div class="headingHome">
+            <a href="#" role="button" data-slide="prev">
+                <span class="leftLatestItem" aria-hidden="true"></span>
+            </a>
+            <span>Featured Items</span>
+            <a href="#" role="button" data-slide="next">
+                <span class="rightLatestItem" aria-hidden="true"></span>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .headSecHome {
+        position: relative;
+    }
+
+    .headSecHome > div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+    }
+
+    .headingHome {
+        background: #fff;
+        text-align: center;
+        display: table;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        -moz-transform: translate(-50%, -50%);
+        -webkit-transform: translate(-50%, -50%);
+        -o-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+
+    .headingHome > a {
+        color: #000;
+        text-decoration: none !important;
+        display: table-cell;
+    }
+
+    .leftLatestItem {
+        content: " ";
+        width: 0;
+        height: 0;
+        margin: 0;
+        display: inline-block;
+        border-right: 18px solid;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+    }
+
+    .rightLatestItem {
+        content: " ";
+        width: 0;
+        height: 0;
+        margin: 0;
+        display: inline-block;
+        border-left: 18px solid;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+    }
+
+    .headingHome > span {
+        padding: 0 20px;
+        font-size: 20px;
+        font-weight: bold;
+        text-transform: uppercase;
+        display: table-cell;
+    }
+
+    .lineSecHome {
+        width: 100%;
+        border-bottom: 1px solid #000;
+    }
+
+    @media only screen and (max-width: 767px) {
+        .headingHome > span {
+            padding: 0 10px;
+            font-size: 16px;
+        }
+
+        .leftLatestItem {
+            border-right: 12px solid;
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+        }
+
+        .rightLatestItem {
+            border-left: 12px solid;
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+        }
+    }
+</style>

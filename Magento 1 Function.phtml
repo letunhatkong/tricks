@@ -1,0 +1,227 @@
+<?php
+/**
+ * Create custom attribute in magento
+ * Lưu ý: tên biến không được có số
+ * app/local/customerAttribute/sql/custom_setup/mysql4-install-0.1.0.php
+ */
+
+$installer->addAttribute("customer", "fix_state_issued_by",  array(
+    "type"     => "varchar",
+    "backend"  => "",
+    "label"    => "State Issued By",
+    "input"    => "text",
+    "source"   => "",
+    "visible"  => true,
+    "required" => false,
+    "default" => "",
+    "frontend" => "",
+    "unique"     => false,
+    "note"       => ""
+
+));
+
+$attribute   = Mage::getSingleton("eav/config")->getAttribute("customer", "fix_state_issued_by");
+$used_in_forms=array();
+$used_in_forms[]="adminhtml_customer";
+$used_in_forms[]="checkout_register";
+$used_in_forms[]="customer_account_create";
+$used_in_forms[]="customer_account_edit";
+$used_in_forms[]="adminhtml_checkout";
+$attribute->setData("used_in_forms", $used_in_forms)
+    ->setData("is_used_for_customer_segment", true)
+    ->setData("is_system", 0)
+    ->setData("is_user_defined", 1)
+    ->setData("is_visible", 1)
+    ->setData("sort_order", 100)
+;
+$attribute->save();
+
+
+
+
+$installer->addAttribute("customer", "fix_resale_expired",  array(
+    "type"     => "datetime",
+    "backend"  => "eav/entity_attribute_backend_datetime",
+    "label"    => "Expiration Date",
+    "input"    => "date",
+    "source"   => "",
+    "visible"  => true,
+    "required" => false,
+    "default" => "",
+    "frontend" => "",
+    "unique"     => false,
+    "note"       => ""
+
+));
+
+$attribute   = Mage::getSingleton("eav/config")->getAttribute("customer", "fix_resale_expired");
+$used_in_forms=array();
+$used_in_forms[]="adminhtml_customer";
+$used_in_forms[]="checkout_register";
+$used_in_forms[]="customer_account_create";
+$used_in_forms[]="customer_account_edit";
+$used_in_forms[]="adminhtml_checkout";
+$attribute->setData("used_in_forms", $used_in_forms)
+    ->setData("is_used_for_customer_segment", true)
+    ->setData("is_system", 0)
+    ->setData("is_user_defined", 1)
+    ->setData("is_visible", 1)
+    ->setData("sort_order", 100)
+;
+$attribute->save();
+
+// # Create custom attribute in magento
+?>
+
+<?php
+// Get Custom Attribute in Magento
+$_product= Mage::getSingleton('catalog/product')->load($_item->getProductId());
+echo $_product->getResource()->getAttribute('attributeCode')->getFrontend()->getValue($_product);
+$product->getData("attributeCode");
+$product->getAttributeText("attributeCode");
+// # Get Custom Attribute in Magento
+
+// Get Order ID Magento
+$_order->getRealOrderId(); //  100000064
+$_order->getIncrementId();  // 100000064
+$_order->getEntityId(); // 64
+
+//Get Stock status isinstock Magento
+$product->getStockItem()->getIsInStock();
+
+//Get Current link url Magento
+$currentUrl = Mage::helper('core/url')->getCurrentUrl();
+$url = Mage::getSingleton('core/url')->parseUrl($currentUrl);
+$path = $url->getPath();
+
+
+
+/**
+ * Get MSRP Price ( Manufacturer’s Suggested Retail Price ) Magento
+ * "true" for price format.
+ * "false" for no html.
+ * Reference: http://siven76.com/2013/03/08/magento-display-manufacturers-suggested-retail-price/
+ */
+$_msrpPrice = $this->helper('core')->currency($_product->getMsrp(),true,true);
+
+
+/**
+ * Call static block from code
+ */
+$this->getLayout()->createBlock('cms/block')->setBlockId('block_detail_right_1')->toHtml()
+
+
+/** *
+ * Get order detail in magento
+ * https://universalcoder.wordpress.com/2014/03/20/custom-thank-you-page-in-magento-success-phtml/
+ * https://universalcoder.wordpress.com/2014/03/21/custom-thank-you-page-in-magento-success-phtml-part-2/
+ */
+
+
+
+?>
+
+<!--Permission file and folder in Magento-->
+sudo find /var/www/html/magentoInstallationFolder/ -type d -exec chmod 775 {} \;
+sudo find /var/www/html/magentoInstallationFolder/ -type f -exec chmod 664 {} \;
+sudo find -type d -exec chmod 775 {} \;
+sudo find -type f -exec chmod 664 {} \;
+Set Writable for 3 folders in root magento: var, media, app/etc
+sudo chmod -R 777 var/  media/ app/etc/ downloader/
+
+
+<!--Service Temporarily Unavailable - Magento-->
+Bug: The server is temporarily unable to service your request due to maintenance downtime or capacity problems. Please try again later.
+Check if there is a file called maintenance.flag in your magento root. If so Delete it.
+Delete all file in magentoRoot/var/cache/* : sudo rm -rf magento/var/cache/*
+Reference: http://stackoverflow.com/questions/8102777/service-temporarily-unavailable-magento
+
+<!--Fix bugs: White page, Blank Page in magento-->
+In file index.php. You recomment // ini_set('display_errors', 1);
+Result: ini_set('display_errors', 1);
+Check erros code of white page. Make sure codes of Core Magento, Modules, ... are true.
+Clear cache, Reindex in Admin magento. Remove caches in magento/var/cache/*
+FINAL: Permision files of magento. Link
+http://letunhatkong.blogspot.com/2015/07/permission-file-and-folder-in-magento.html
+
+
+<!--Remove /index.php from URL in magento-->
+Mặc định thì magento phiên bản > 1.9.1.1 đã fix lỗi này.
+Kiểm tra admin magento
+'System > Configuration > Web > 'Search Engine Optimisation' tab
+select 'YES' underneath the 'Use Web Server Rewrites' option.
+Kiểm tra file .htaccess có các dòng sau không
+(phiên bản magento > 1.9.1.1 thì ko cần kiểm tra )
+Options +FollowSymLinks
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule . index.php [L]
+
+
+<!--INSTALL MAGENTO IN LINUX-->
+Read more:
+https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-magento-on-ubuntu-14-04
+
+sudo apt-get update
+sudo apt-get install apache2
+
+sudo apt-get install mysql-server php5-mysql
+sudo mysql_install_db
+sudo mysql_secure_installation
+
+sudo apt-get install php5 libapache2-mod-php5 php5-mcrypt libcurl3 php5-curl php5-gd
+
+sudo nano /etc/apache2/mods-enabled/dir.conf
+Change line: DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
+
+sudo nano /etc/apache2/sites-available/magento.conf
+
+< VirtualHost *:80 >
+DocumentRoot /var/www/html
+< Directory /var/www/html/  >
+
+Options Indexes FollowSymLinks MultiViews
+AllowOverride All
+<  / Directory >
+< / VirtualHost >
+
+
+
+sudo a2ensite magento.conf
+sudo a2dissite 000-default.conf
+
+sudo a2enmod rewrite
+sudo php5enmod mcrypt
+
+mysql -u root -p
+CREATE DATABASE magento;
+CREATE USER magento_user@localhost IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON magento.* TO magento_user@localhost IDENTIFIED BY 'password';
+FLUSH PRIVILEGES;
+exit
+
+Copy magento folder to this path /var/www/html/
+
+Permission folder
+sudo find /var/www/html/magentoInstallationFolder/ -type d -exec chmod 775 {} \;
+sudo find /var/www/html/magentoInstallationFolder/ -type f -exec chmod 664 {} \;
+
+sudo find -type d -exec chmod 775 {} \;
+sudo find -type f -exec chmod 664 {} \;
+
+Set Writable for 3 folders in root magento: var, media, app/etc
+sudo chmod -R 777 var/  media/ app/etc/ downloader/
+
+
+
+
+
+
+
+
+
+
+
+

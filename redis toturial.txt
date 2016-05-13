@@ -1,0 +1,110 @@
+
+REDIS TUTORIAL
+==================================
+SET KEY VALUE
+set resource:a 12  => 12
+set abc "test" => "test"
+==================================
+GET KEY
+get abc => "test"
+==================================
+DEL KEY
+del abc
+get abc => null
+==================================
+EXPIRE KEY TIME
+expire abc 10 /* After 10 seconds = del abc */
+....
+get abc => null
+==================================
+TTL KEY
+return the number of seconds until KEY will be deleted
+expire abc 20
+TTL abc => 18
+==================================
+RPUSH KEY VALUE
+Put new value in the end of the list
+set a 1
+RPUSH a 2 => a = [1, 2]
+==================================
+LPUSH KEY VALUE
+Put new value in the start of the list
+set a 1
+RPUSH a 2
+LPUSH a 0 => a = [0, 1, 2]
+
+==================================
+LRANGE KEY number number
+get value in range [start, end]
+a = [ 0, 1, 2]
+LRANGE a 0 2 => 0, 1, 2
+LRANGE a 1 1 => 1
+LRANGE a -1 2 => 2
+LRANGE a -2 2 => 1, 2
+LRANGE a -3 2 => 0, 1, 2
+LRANGE a -4 2 => 0, 1, 2
+LRANGE a -5 2 =>  0, 1, 2
+LRANGE a 0 0 => 0
+LRANGE a 0  -1 => 0, 1
+LRANGE a 0  -2 => 0, 1, 2
+LRANGE a 0  -3 => 0, 1, 2
+LRANGE a 0  -4 => 0, 1, 2
+LRANGE a 2 6 => 2
+LRANGE a 1 2 => 1, 2
+LRANGE a 3 4 => 0, 1, 2
+LRANGE a 2 1 => NULL
+LRANGE a 1 0 => NULL
+LRANGE a 6 9 => NULL
+LRANGE a 6 9 => NULL
+LRANGE a 9 6 => NULL
+==================================
+LLEN KEY
+return length of list
+a = [0, 1, 2]
+llen a => 3
+==================================
+LPOP KEY
+Delete the first element of list and return value
+a = [0,1,2]
+LPOP a => 0
+LRANGE a 0 3 => 1, 2
+==================================
+RPOP KEY
+Delete the last element of list and return value
+a = [0,1,2]
+LPOP a => 2
+LRANGE a 0 3 => 0, 1
+
+
+==================================
+SADD Key value
+add value to the set
+==================================
+SISMEMBER KEY KEY
+test key if key is set. return 1 if is set and retunr 0 if not set.
+
+==================================
+SMEMBERS KEY
+return a list all member of this set
+SADD s "a"
+SADD s "b"
+SADD s "c"
+SMEMBERS s => "a", "b", "c"
+
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+==================================
+
