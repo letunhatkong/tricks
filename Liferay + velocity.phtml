@@ -1,0 +1,159 @@
+<!--Get distance time in Asset Publisher with velocity-->
+<!-- Get timing -->
+#set ($cre = $curEntry.getModifiedDate())
+#set ($cur = $dateTool.getDate())
+
+#if (   $dateTool.getYear() == $dateTool.getYear($cre) &&
+$dateTool.getMonth() == $dateTool.getMonth($cre) &&
+$dateTool.getDay() == $dateTool.getDay($cre)   )
+
+#set ($hour = $dateTool.getValue("hour", $cre) )
+#set ($minute = $dateTool.getValue("minute", $cre) )
+#set ($second =  $dateTool.getValue("second", $cre) )
+#set ($creTotal = $hour*3600 + $minute*60 + $second )
+
+#set ($hour = $dateTool.getValue("hour", $cur) )
+#set ($minute = $dateTool.getValue("minute", $cur) )
+#set ($second =  $dateTool.getValue("second", $cur) )
+#set ($curTotal = $hour*3600 + $minute*60 + $second )
+
+#set ($total = $curTotal - $creTotal)
+
+#if ($total >= 3600)
+#set ($timing = $total/3600)
+#set ($timing = "$timing giờ trước")
+#elseif ($total >= 60)
+#set ($timing = $total/60)
+#set ($timing = "$timing phút trước")
+#else
+#set ($timing = "$total giây trước")
+#end
+#else
+#set ($timing =  "$dateUtil.getDaysBetween($cre, $cur) ngày trước")
+#end
+<!-- # Get timing -->
+
+
+<!--Get Date in velocity, template Liferay-->
+#set ($JALS = $serviceLocator.findService("com.liferay.portlet.journal.service.JournalArticleLocalService"))
+
+#set ($assetEntry = $request.get("attributes").get("view.jsp-assetEntry"))
+#set ($subStr = $stringUtil.split($assetEntry, ","))
+
+#set ($assetEntry = $subStr.get(8))
+#set( $classPk = $stringUtil.extractDigits($assetEntry))
+#set($cur_classPk = 0)
+#set($cur_classPk = $cur_classPk.parseInt($classPk))
+
+#set ($curEntry = $JALS.getLatestArticle($cur_classPk) )
+
+#set($creDate = $dateTool.format('dd/MM/y - hh:mm:ss ', $curEntry.getCreateDate()))
+#set($modDate = $dateTool.format('dd/MM/y - hh:mm:ss ', $curEntry.getModifiedDate()))
+
+<!--========================  Other way ============================-->
+
+#set ($entryService = $serviceLocator.findService("com.liferay.portlet.asset.service.AssetEntryLocalService"))
+#set ($assetEntry = $request.get("attributes").get("view.jsp-assetEntry"))
+#set ($subStr = $stringUtil.split($assetEntry, ","))
+#set ($entryId = $subStr.get(0))
+
+#set ($entryId = $stringUtil.extractDigits($entryId))
+#set ($cur = 0)
+#set ($entryId = $cur.parseInt($entryId))
+#set ($curEntry = $entryService.getEntry($entryId))
+
+#set($creDate = $dateTool.format('dd/MM/y - H:mm', $curEntry.getCreateDate()))
+#set($modDate = $dateTool.format('dd/MM/y - H:mm', $curEntry.getModifiedDate()))
+
+<p class="date-author">
+    Được viết bởi: <span style="color:#ff1496">$reserved-article-author-name.data</span> <br>
+    #if ($creDate) Ngày đăng: $creDate <br> #end
+    #if ($modDate) Lần cập nhập cuối: $modDate <br> #end
+    #if ($curEntry.getViewCount()) Lượt xem: $curEntry.getViewCount() #end
+</p>
+
+
+
+<!--Get viewCount & commentCount in ADT Liferay-->
+<!-- Get ViewCount -->
+
+#set($entryService = $serviceLocator.findService("com.liferay.portlet.asset.service.AssetEntryLocalService"))
+
+#set ($entry = $entryService.getEntry($curBlogEntry.groupId, $curBlogEntry.uuid))
+$entry.getViewCount()
+
+<!-- # Get ViewCount -->
+
+<!-- Get CommentCount -->
+
+#set($mbmService = $serviceLocator.findService("com.liferay.portlet.messageboards.service.MBMessageLocalService"))
+#set($cmtCount = $mbmService.getDiscussionMessagesCount($entry.getClassNameId(),$entry.getClassPK(),0))
+$cmtCount
+
+<!-- # Get CommentCount -->
+
+<!--Note;-->
+<!--$mbmService.getDiscussionMessagesCount($entry.getClassNameId(),$entry.getClassPK(), STATUS))-->
+<!--public static final int STATUS_ANY = -1;-->
+<!--public static final int STATUS_APPROVED = 0;-->
+<!--public static final int STATUS_PENDING = 1;-->
+<!--public static final int STATUS_DRAFT = 2;-->
+<!--public static final int STATUS_EXPIRED = 3;-->
+<!--public static final int STATUS_DENIED = 4;-->
+<!--see more: com.liferay.portal.kernel.workflow.WorkflowConstants -->
+
+
+
+<!--Get URL Home Site in Velocity-->
+$themeDisplay.getPathFriendlyURLPublic()
+$themeDisplay.getScopeGroup().getFriendlyURL()
+
+Example: http://192.168.2.3:8080/web/qtn-global/dang-ky-thanh-vien-qtn
+$themeDisplay.getPathFriendlyURLPublic()  = /web
+$themeDisplay.getScopeGroup().getFriendlyURL()  = /qtn-global
+<a href="$themeDisplay.getPathFriendlyURLPublic()$themeDisplay.getScopeGroup().getFriendlyURL()/dang-ky-thanh-vien-qtn" >Test Link</a>
+
+
+
+<!--Velocity Variables Available in Web Content-->
+<!--Reference: http://www.liferay.com/community/wiki/-/wiki/Main/Velocity+Variables+Available+in+Web+Content-->
+
+$reserved-article-id.data
+$reserved-article-version.data
+$reserved-article-title.data
+$reserved-article-create-date.data
+$reserved-article-modified-date.data
+$reserved-article-display-date.data
+$reserved-article-author-id
+$reserved-article-author-name
+$reserved-article-author-email-address
+$reserved-article-author-comments
+$reserved-article-author-organization
+$reserved-article-author-location
+$reserved-article-author-job-title
+
+
+<!--Get field structure Liferay in velocity.-->
+#set($jA=$serviceLocator.findService("com.liferay.portlet.journal.service.JournalArticleLocalService"))
+#set($article = $jA.getLatestArticle($curEntry.getClassPK()))
+#set($doc = $saxReaderUtil.read($article.getContent()))
+#set($imgA = $doc.selectSingleNode("//*/dynamic-element[@name='imgA']/dynamic-content"))
+#set($txtSum = $doc.selectSingleNode("//*/dynamic-element[@name='txtSum']/dynamic-content"))
+#set($htmlContent = $doc.selectSingleNode("//*/dynamic-element[@name='htmlContent']/dynamic-content"))
+#set($txtLink = $doc.selectSingleNode("//*/dynamic-element[@name='txtLink']/dynamic-content"))
+#set($txtDesVideo = $doc.selectSingleNode("//*/dynamic-element[@name='txtDesVideo']/dynamic-content"))
+#set($txtAuthor = $doc.selectSingleNode("//*/dynamic-element[@name='txtAuthor']/dynamic-content"))
+
+
+<!--Get Image User Liferay in Velocity-->
+#set ($UserLocalService = $serviceLocator.findService("com.liferay.portal.service.UserLocalService"))
+#set ($ImageLocalService = $serviceLocator.findService("com.liferay.portal.service.ImageLocalService"))
+#set ($user = $UserLocalService.getUserById($userId))
+#set ($fullName = $user.getFullName())
+#set ($portraitId = $user.getPortraitId())
+#set ($imageProfile = $ImageLocalService.getImage($portraitId))
+#set ($imageId = $imageProfile.getImageId())
+
+<img src="/image/logo?img_id=$imageId&t=$dateUtil.newTime()"/>
+
+

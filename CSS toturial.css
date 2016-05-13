@@ -1,0 +1,132 @@
+/*Create triangle*/
+.triangle {
+    width: 0;
+    height: 0;
+    margin: -2px 0 0 2px;
+    display: inline-block;
+    border-left: 7px solid;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+}
+
+/*Tạo hiệu ứng răng cưa CSS*/
+.paper:after {
+    content: "";
+    width: 100%;
+    height: 10px;
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    /*background: linear-gradient(135deg, #fff25, transparent 25%) center top repeat-x, linear-gradient(045deg, transparent 75%, #fff75) center top repeat-x;*/
+    background-size: 12px 8px;
+}
+
+/*Zoom Image when hover or focus with CSS*/
+ul li div {
+    overflow: hidden;
+}
+
+ul li div:hover img, ul li div:focus img {
+    -webkit-transform: scale(1.3);
+    transform: scale(1.3);
+}
+
+ul li div img {
+    -webkit-transition: all 2s ease-out;
+    transition: all 2s ease-out;
+}
+
+/*CSS: Reverse blocks*/
+.reverse {
+    -webkit-transform: scaleY(-1);
+    transform: scaleY(-1);
+}
+
+/*Fix bug: Changed size font in horizontal iphone (iphone ngang)*/
+.aui {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+/*Vertical Centering With CSS*/
+/*(know Width, know Height)*/
+div.parenr {
+    width: 40%;
+    padding-bottom: 25.05%;
+/ / Ratio position: relative;
+}
+
+div.parent .centerDiv {
+    width: 315px;
+    height: 170px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+/*
+<div class="outter">
+    <div class="miđle">
+        <div class="inner"></div>
+    </div>
+</div>
+*/
+.outterDiv {
+    display: table;
+    position: absolute;
+    height: 100%;
+    width: 100%
+}
+
+.middleDIV {
+    display: table-cell;
+    vertical-align: middle
+}
+
+.innerDiv {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100px;
+}
+
+/*Other way*/
+.parent-element {
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+
+.element {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/*Other way: (know Width, unknow Height)*/
+.parent-center {
+    width: 100%;
+    display: table;
+    text-align: center;
+}
+
+.parent-center .mid-content {
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+/*Other way (unknow width, unknow height)*/
+.parent {
+    position: relative;
+}
+
+.child {
+    /*width: 80%;*/
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
