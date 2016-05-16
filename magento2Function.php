@@ -179,13 +179,13 @@ curl --version (>= 7.34)
 
 3/ Config memory_limit of PHP
 Ubuntu: /etc/php5/cli/php.ini and /etc/php5/apache2/php.ini
-Change memory_limit to:
-memory_limit = 768M or more for normal operation
-memory_limit = 2G or more for testing
-upload_max_filesize
-post_max_size
-mod_rewrite module must be enabled: a2enmod rewrite
+
+memory_limit = 768M or 1G
+post_max_size 100M
 always_populate_raw_post_data = -1
+upload_max_filesize 100M
+
+mod_rewrite module must be enabled: a2enmod rewrite
 Save your changes and Restart Apache: sudo service apache2 restart
 
 4/ Create vitrual machine
@@ -224,14 +224,15 @@ sudo service apache2 restart
 
 5/ Create DATABASE
 mysql -u root -p
-CREATE DATABASE siva;CREATE USER siva@localhost IDENTIFIED BY '1';
+CREATE DATABASE siva;
+CREATE USER siva@localhost IDENTIFIED BY '1';
 GRANT ALL PRIVILEGES ON siva.* TO siva@localhost IDENTIFIED BY '1';
 FLUSH PRIVILEGES;
-exit
+exit;
 
 6/ Autoload error - Vendor autoload is not found. Please run 'composer install' under application root directory.
 sudo apt-get update
-sudo apt-get install curl php5-cli git
+sudo apt-get install git
 
 curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 cd to magento folder

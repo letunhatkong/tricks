@@ -1,3 +1,5 @@
+Convert .ppk to .pem
+puttygen bplnew.ppk -O private-openssh -o bplnew.pem
 
 
 Copy and Rsync in Linux
