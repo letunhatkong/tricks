@@ -220,9 +220,6 @@ Go to specified location -> Ctrl+L
 Search files (find) -> Ctrl+F
 
 
-
-
-
 Create file: name.desktop and edit file with gedit
 
 [Desktop Entry]
@@ -237,3 +234,8 @@ Categories=Utility;Application;
 
 Rename file to *.desktop
 Right click -> Properties -> permissions -> Check Allow executing file as program
+
+
+============================
+PHP Storm 10
+http://idea.lanyus.com

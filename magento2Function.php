@@ -18,6 +18,8 @@ sudo bin/magento module:status
 
 <!-- Remove Module -->
 Remove all related tabel, and remove module in setup_module table
+DROP TABLE IF EXISTS magefan_blog_category, magefan_blog_category_store;
+DELETE FROM setup_module WHERE module = "Magefan_Blog";
 sudo bin/magento module:uninstall Magentostudy_News --backup-code --backup-media --backup-db --clear-static-content
 <!-- Disable Module -->
 sudo bin/magento module:disable Magentostudy_News
@@ -224,10 +226,7 @@ sudo service apache2 restart
 
 5/ Create DATABASE
 mysql -u root -p
-CREATE DATABASE siva;
-CREATE USER siva@localhost IDENTIFIED BY '1';
-GRANT ALL PRIVILEGES ON siva.* TO siva@localhost IDENTIFIED BY '1';
-FLUSH PRIVILEGES;
+CREATE DATABASE gg; CREATE USER gg@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON gg.* TO gg@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
 exit;
 
 6/ Autoload error - Vendor autoload is not found. Please run 'composer install' under application root directory.
@@ -287,11 +286,4 @@ How to debug and fix:
 4) Re run bin/magento setup:upgrade
 
 Now you'll see what is really wrong, and you can fix it. Personally i remove everything in pub/static, this will be auto generated content so you should not be worried about that.
-
-
-
-
-
-
-
 

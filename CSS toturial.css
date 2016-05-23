@@ -130,3 +130,13 @@ div.parent .centerDiv {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+
+/* Short Text CSS */
+.sortTitle {
+width: calc(100% - 20px);
+/*display: inline;*/
+text-overflow: ellipsis;
+white-space: nowrap;
+overflow: hidden;
+}

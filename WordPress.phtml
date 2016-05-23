@@ -1,0 +1,50 @@
+INSTALL
+
+
+1/ INSTALL PHP, APACHE2, MySQL
+==== PHP
+# sudo apt-get -y update
+# sudo add-apt-repository ppa:ondrej/php5-5.6
+# sudo apt-get -y update
+# sudo apt-get -y install php5 php5-common php5-mcrypt php5-curl php5-cli php5-mysql php5-gd php5-intl php5-xsl libapache2-mod-php5 libcurl3 libssh2-php
+# sudo apt-get install mysql-server-5.6 php5-mysql 
+
+
+==== Config Apache2
+# sudo apt-get install apache2
+# sudo nano /etc/apache2/site-avalaible/siva.conf
+<VirtualHost siva.vn:80>
+    ServerAdmin siva@localhost
+    DocumentRoot /var/www/html/siva
+    ServerName siva.vn
+
+    <Directory /var/www/html/siva>
+        Allow from all
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Order allow,deny
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/siva-log.log
+    CustomLog ${APACHE_LOG_DIR}/siva-access.log combined
+
+</VirtualHost>
+# sudo nano /etc/hosts
+127.0.1.1 siva.vn
+
+
+==== MySQL
+# sudo a2enmod rewrite
+# mysql -u root -p
+CREATE DATABASE gg; CREATE USER gg@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON gg.* TO gg@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
+exit;
+
+
+2/ Download WORDPRESS
+Copy WP to /var/www/html/siva
+Copy wp-config-sample.php to wp-config.php
+
+
+3/ PERMISSION
+# sudo chown -R www-data:www-data /var/www/html/siva
+# sudo chmod -R 777 /var/www/html/siva
