@@ -19,3 +19,17 @@ $(location).attr('pathname');       //   index.php
 $(location).attr('href');           //   http://www.test.com:8082/index.php#tab2
 $(location).attr('hash');          //    #tab2
 $(location).attr('search');        //    ?foo=123
+
+
+// Toggle css menu
+$('.itemMenuFt .titFt').click(function(){
+    var subMenu = $(this).parent().find('.subMenuFt');
+    subMenu.toggle();
+    if (subMenu.is(":visible")) {
+        $(this).addClass("open");
+    } else {
+        $(this).removeClass("open");
+    }
+});
+
+

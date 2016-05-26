@@ -1,3 +1,10 @@
+/* Adjust text */
+* {
+    -ms-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
 /*Create triangle*/
 .triangle {
     width: 0;
@@ -134,9 +141,23 @@ div.parent .centerDiv {
 
 /* Short Text CSS */
 .sortTitle {
-width: calc(100% - 20px);
-/*display: inline;*/
-text-overflow: ellipsis;
-white-space: nowrap;
-overflow: hidden;
+    width: calc(100% - 20px);
+    /*display: inline;*/
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Css color place holder - placeholder */
+::-webkit-input-placeholder {
+   color: red;
+}
+:-moz-placeholder { /* Firefox 18- */
+   color: red;  
+}
+::-moz-placeholder {  /* Firefox 19+ */
+   color: red;  
+}
+:-ms-input-placeholder {  
+   color: red;  
 }

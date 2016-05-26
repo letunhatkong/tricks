@@ -52,7 +52,14 @@ $curUrl = explode("?", $urlInterface->getCurrentUrl())[0];
 {{block class="Magento\Framework\View\Element\Template" name="test_file" template="Magento_Theme::html/latestItems.phtml"}}
 <?php include ($block->getTemplateFile('Magento_Theme::html/test.phtml')) ?>
 <?php echo $this->getLayout()->createBlock("Magento\Framework\View\Element\Template")->setTemplate("Magento_Theme::html/test.phtml")->toHtml(); ?>
-
+<?php echo $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('block_identifier')->toHtml();?>
+<referenceContainer name="content">
+    <block class="Magento\Cms\Block\Block" name="block_identifier">
+        <arguments>
+            <argument name="block_id" xsi:type="string">block_identifier</argument>
+        </arguments>
+    </block>
+</referenceContainer>
 
 <!-- GET CURRENT CATEGORY -->
 <?php
@@ -114,7 +121,16 @@ $promo = $promotionCollection->create()
     ->setOrder('created_at', 'DESC')->load();
 ?>
 
-
+<!-- Init Javascript -->
+<script type="text/javascript">
+    require(['jquery', 'jquery/ui'], function($){
+        $(document).ready(function($) {
+            $(window).load(function() {
+                ....
+            });
+        });
+    });
+</script>
 
 
 <!-- Layout -->
