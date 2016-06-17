@@ -1,0 +1,102 @@
+
+=== Instagram API ===
+
+0. Create a new app
+https://www.instagram.com/developer/clients/manage/
+CLIENT INFO SIVA
+CLIENT ID	98164b1728f148c0ae005e3493cd2a2b
+CLIENT SECRET	793acb2a607b4ff19788a55dfa218406
+WEBSITE URL	http://siva.vn
+REDIRECT URI	http://siva.vn
+SUPPORT EMAIL	letunhatkong@gmail.com
+letunhatkong: 3309870573
+access_token siva.vn: 3309870573.98164b1.d872979b5c61476ea4994fcd5d316ea5
+
+
+1. Find User id
+http://www.otzberg.net/iguserid/index.php
+
+2. Get code 
+https://api.instagram.com/oauth/authorize/?client_id=CLIENT-ID&redirect_uri=REDIRECT-URI&response_type=code
+
+3. Get access_token
+type in linux cmd:
+curl -F 'client_id=98164b1728f148c0ae005e3493cd2a2b' \
+-F 'client_secret=793acb2a607b4ff19788a55dfa218406' \
+-F 'grant_type=authorization_code' \
+-F 'redirect_uri=http://52.39.199.186/' \
+-F 'code=5c2f8f00733648a084382579902f5b20' \
+https://api.instagram.com/oauth/access_token
+
+
+http://52.39.199.186/?code=5c2f8f00733648a084382579902f5b20
+http://siva.vn/?code=9dcf2108c3ac43129f4029bcc9696d39
+
+4. Get data
+<?php
+function fetchData($url){
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+    $result = curl_exec($ch);
+    curl_close($ch);
+    return $result;
+}
+$result = fetchData("https://api.instagram.com/v1/users/460563723/media/recent?access_token=3309870573.98164b1.d872979b5c61476ea4994fcd5d316ea5");
+echo $result;
+$result = json_decode($result);
+
+foreach ($result->data as $post) {
+   var_dump($post);
+   break;
+}
+?>
+
+object(stdClass)#1122 (15) { 
+	["attribution"]=> NULL 
+	["tags"]=> array(0) { } 
+	["type"]=> string(5) "image" 
+	["location"]=> NULL 
+	["comments"]=> object(stdClass)#1247 (1) { ["count"]=> int(0) } 
+	["filter"]=> string(6) "Normal" 
+	["created_time"]=> string(10) "1465980278" 
+	["link"]=> string(40) "https://www.instagram.com/p/BGqzuBLCPta/" 
+	["likes"]=> object(stdClass)#1166 (1) { ["count"]=> int(0) } 
+	["images"]=> object(stdClass)#1108 (3) { 
+		["low_resolution"]=> object(stdClass)#1147 (3) { 
+			["url"]=> string(151) "https://scontent.cdninstagram.com/t51.2885-15/s320x320/e35/13392647_1579044049062434_1611277269_n.jpg?ig_cache_key=MTI3MzA1NzMwNzQxMjQ2MjQyNg%3D%3D.2.l" 
+			["width"]=> int(320) 
+			["height"]=> int(320) 
+		} 
+		["thumbnail"]=> object(stdClass)#1219 (3) { 
+			["url"]=> string(163) "https://scontent.cdninstagram.com/t51.2885-15/s150x150/e35/c0.95.768.768/13385621_148838945521951_483117555_n.jpg?ig_cache_key=MTI3MzA1NzMwNzQxMjQ2MjQyNg%3D%3D.2.c" 
+			["width"]=> int(150) 
+			["height"]=> int(150) 
+		} 
+		["standard_resolution"]=> object(stdClass)#1126 (3) { 
+			["url"]=> string(158) "https://scontent.cdninstagram.com/t51.2885-15/s640x640/sh0.08/e35/13392647_1579044049062434_1611277269_n.jpg?ig_cache_key=MTI3MzA1NzMwNzQxMjQ2MjQyNg%3D%3D.2.l" 
+			["width"]=> int(640) 
+			["height"]=> int(640) 
+		} 
+	} 
+	["users_in_photo"]=> array(0) { } 
+	["caption"]=> object(stdClass)#1114 (4) { 
+		["created_time"]=> string(10) "1465980278" 
+		["text"]=> string(9) "White LOL" 
+		["from"]=> object(stdClass)#1135 (4) { 
+			["username"]=> string(12) "letunhatkong" 
+			["profile_picture"]=> string(116) "https://igcdn-photos-f-a.akamaihd.net/hphotos-ak-xat1/t51.2885-19/s150x150/13408825_850610411711365_1887981232_a.jpg" 
+			["id"]=> string(10) "3309870573" 
+			["full_name"]=> string(11) "Samuel Kong" 
+		} 
+		["id"]=> string(17) "17857743217007909" 
+	} 
+	["user_has_liked"]=> bool(false) 
+	["id"]=> string(30) "1273057307412462426_3309870573" 
+	["user"]=> object(stdClass)#1192 (4) { 
+		["username"]=> string(12) "letunhatkong" 
+		["profile_picture"]=> string(116) "https://igcdn-photos-f-a.akamaihd.net/hphotos-ak-xat1/t51.2885-19/s150x150/13408825_850610411711365_1887981232_a.jpg" ["id"]=> string(10) "3309870573" 
+		["full_name"]=> string(11) "Samuel Kong" 
+	} 
+}
