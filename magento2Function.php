@@ -1,30 +1,48 @@
 <!-- Re-INDEX -->
-sudo bin/magento indexer:reindex
+sudo php bin/magento indexer:reindex
 
 <!-- Re-DEPLOY -->
-sudo bin/magento setup:static-content:deploy
+sudo php bin/magento setup:static-content:deploy
 
 <!-- CLEAR CACHE -->
 Go to magento folder and type: php bin/magento cache:clean
-sudo bin/magento cache:clean
+sudo php bin/magento cache:clean
 
 <!-- Upgrade -->
-sudo bin/magento setup:upgrade
+sudo php bin/magento setup:upgrade
 sudo rm -rf var/di/
-sudo bin/magento setup:di:compile 
+sudo php bin/magento setup:di:compile 
 
 <!-- List Module Status -->
-sudo bin/magento module:status
+sudo php bin/magento module:status
 
 <!-- Remove Module -->
 Remove all related tabel, and remove module in setup_module table
 DROP TABLE IF EXISTS magefan_blog_category, magefan_blog_category_store;
 DELETE FROM setup_module WHERE module = "Magefan_Blog";
-sudo bin/magento module:uninstall Magentostudy_News --backup-code --backup-media --backup-db --clear-static-content
+sudo php bin/magento module:uninstall Magentostudy_News --backup-code --backup-media --backup-db --clear-static-content
 <!-- Disable Module -->
-sudo bin/magento module:disable Magentostudy_News
+sudo php bin/magento module:disable Magentostudy_News
 <!-- Enable Module -->
 php bin/magento module:enable Sahy_Banner --clear-static-content
+
+<!-- Update Magento 2 -->
+The second way is with composer:
+In composer.json change this line
+"magento/product-community-edition": "2.0.0",
+Also you should change the line 5 as well "version": "2.0.0", to keep it in sync.
+to whatever version you want, and then run:
+composer update
+php bin/magento setup:upgrade
+php bin/magento setup:static-content:deploy
+
+To upgrade to 2.0.7 using the command line: cd /var/www/html/magento2
+php bin/magento cache:disable
+composer require magento/product-community-edition 2.0.7 --no-update
+composer update
+php bin/magento setup:upgrade
+php bin/magento cache:enable
+
 
 <!-- GET BASE URL -->
 <?php 
@@ -90,7 +108,6 @@ $collection = $productCollection->create()
     ->setPageSize(12) // Limit product
     ->load();
 
-$latestAr = [];
 foreach ($collection as $product){
     $item = array(
         'getId' => $product->getId(),
@@ -101,9 +118,7 @@ foreach ($collection as $product){
         'thumbnail' => $mediaUrl .'catalog/product'. $product->getThumbnail(),
         'getProductUrl' => $product->getProductUrl(),
     );
-    array_push($latestAr, $item);
 }
-$newProSize = count($latestAr);
 ?>
 
 <?php // Get All Products by Category
@@ -133,6 +148,7 @@ $promo = $promotionCollection->create()
 </script>
 
 
+
 <!-- Layout -->
 <!-- Banner home -->
 <block class="Magento\Framework\View\Element\Template" name="top.slider.home" template="Magento_Theme::html/top-slider-home.phtml"/>
@@ -157,7 +173,8 @@ $promo = $promotionCollection->create()
         </arguments>
     </block>
 </referenceBlock>
-
+<!-- Move Breadcrumb -->
+    <move element="breadcrumbs" destination="content" before="-"/>
 <!-- JS -->
 <block class="Magento\Framework\View\Element\Text" name="carousel">
     <arguments>
@@ -168,6 +185,32 @@ $promo = $promotionCollection->create()
 
 <!-- # Layout -->
 
+<!-- Remove unwanted account navigation links -->
+<referenceBlock name="customer-account-navigation-downloadable-products-link" remove="true"/>
+<!-- subscription link -->
+<referenceBlock name="customer-account-navigation-newsletter-subscriptions-link" remove="true"/>
+<!-- billing agreement link -->
+<referenceBlock name="customer-account-navigation-billing-agreements-link" remove="true"/>
+<!-- product review link -->
+<referenceBlock name="customer-account-navigation-product-reviews-link" remove="true"/>
+<!-- my credit card link -->
+<referenceBlock name="customer-account-navigation-my-credit-cards" remove="true"/>
+<!-- account link -->
+<referenceBlock name="customer-account-navigation-account-link" remove="true"/>
+<!-- account edit link -->
+<referenceBlock name="customer-account-navigation-account-edit-link" remove="true"/>
+<!-- address link -->
+<referenceBlock name="customer-account-navigation-address-link" remove="true"/>
+<!-- orders link -->
+<referenceBlock name="customer-account-navigation-orders-link" remove="true"/>
+<!-- wish list link -->
+<referenceBlock name="customer-account-navigation-wish-list-link" remove="true"/>
+
+<!-- Remove links on Top Links - following code -->
+<referenceBlock name="register-link" remove="true" />           <!--for Create Account Link-->
+<referenceBlock name="authorization-link" remove="true" />      <!--for Sign In Link  -->
+<referenceBlock name="wish-list-link" remove="true" />          <!--for WishList Link-->
+<referenceBlock name="my-account-link" remove="true" />         <!--for My Account Link-->
 
 Install MAGENTO 2
 Link step by step: http://devdocs.magento.com/guides/v2.0/install-gde/bk-install-guide.html
@@ -209,12 +252,12 @@ Save your changes and Restart Apache: sudo service apache2 restart
 4/ Create vitrual machine
 sudo nano /etc/apache2/sites-available/magento.conf                    
 
-< Directory /var/www/html/magento >
+<Directory /var/www/html>
     Allow from all
     Options Indexes FollowSymLinks MultiViews
     AllowOverride All
     Order allow,deny
-< /Directory >
+</Directory>
 
 <VirtualHost siva.vn:80>
     ServerAdmin siva@localhost
@@ -242,8 +285,7 @@ sudo service apache2 restart
 
 5/ Create DATABASE
 mysql -u root -p
-CREATE DATABASE gg; CREATE USER gg@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON gg.* TO gg@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
-exit;
+CREATE DATABASE siva; CREATE USER siva@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON siva.* TO siva@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES; 
 
 6/ Autoload error - Vendor autoload is not found. Please run 'composer install' under application root directory.
 sudo apt-get update
@@ -284,12 +326,19 @@ sudo find . -type d -exec chmod 777 {} \; && sudo find . -type f -exec chmod 664
 
 8/ Go to http://localhost/project-name/setup/
 
+===== UPDATE URL BASE ====
+UPDATE core_config_data SET value = 'http://54.213.49.253/' WHERE config_id = 2; 
+
 ===== BUG MAGENTO ======
 Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock'
 
 Solution:
 sudo service mysql stop
 sudo /etc/init.d/apparmor reload
+sudo service mysql start 
+
+sudo /etc/init.d/apache2 restart
+sudo /etd/init.d/apparmor.d reload
 sudo service mysql start 
 
 ===== BUG MAGENTO ======
@@ -302,4 +351,12 @@ How to debug and fix:
 4) Re run bin/magento setup:upgrade
 
 Now you'll see what is really wrong, and you can fix it. Personally i remove everything in pub/static, this will be auto generated content so you should not be worried about that.
+
+
+<!-- Override Minicart M2 -->
+Edit Your_theme/Magento_Checkout/web/template/minicart/content.html
+sudo php bin/magento setup:static-content:deploy
+Clear Cache.
+Change another theme and clear cache.
+Re-choose current theme and clear cache.
 

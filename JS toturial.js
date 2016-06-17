@@ -33,3 +33,10 @@ $('.itemMenuFt .titFt').click(function(){
 });
 
 
+// Click outside to hidden menu
+$('html').click(function() {
+  //Hide the menus if visible
+});
+$('#menucontainer').click(function(event){
+    event.stopPropagation();
+});

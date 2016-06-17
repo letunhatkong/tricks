@@ -1,8 +1,4 @@
-Convert .ppk to .pem
-puttygen bplnew.ppk -O private-openssh -o bplnew.pem
-
-
-Copy and Rsync in Linux
+<!-- Copy and Rsync in Linux -->
 Copy
 cp -avpr fromFolder toFolder
 -a : Preserve the specified attributes such as directory an file mode, ownership, timestamps, if possible additional attributes: context, links, xattr, all.
@@ -16,10 +12,11 @@ rsync -avz fromFolder toFolder
 -z : With this option, rsync compresses the file data as it is sent to the destination machine, which reduces the amount of data being transmitted — something that is useful over a slow connection.
 -P : View informations
 
+<!-- Unzip  -->
 
-Config Nginx
+
+<!-- Config Nginx -->
 Edit file config
-
 sudo nano /etc/nginx/nginx.conf
 
 "worker_processes" defines how many concurrent processes that Nginx will use.
@@ -27,27 +24,27 @@ sudo nano /etc/nginx/nginx.conf
 In http block
 
 server { # simple reverse-proxy
-    listen       80;
-    server_name  domain2.com www.domain2.com;
-    access_log   logs/domain2.access.log  main;
+  listen       80;
+  server_name  domain2.com www.domain2.com;
+  access_log   logs/domain2.access.log  main;
 
-    # serve static files
-    location ~ ^/(images|javascript|js|css|flash|media|static)/  {
-      root    /var/www/virtual/big.server.com/htdocs;
-      expires 30d;
-    }
-
-    # pass requests for dynamic content to rails/turbogears/zope, et al
-    location / {
-      proxy_pass      http://127.0.0.1:8080;
-    }
+  # serve static files
+  location ~ ^/(images|javascript|js|css|flash|media|static)/  {
+    root    /var/www/virtual/big.server.com/htdocs;
+    expires 30d;
   }
 
-=======================================
-Command
+  # pass requests for dynamic content to rails/turbogears/zope, et al
+  location / {
+    proxy_pass      http://127.0.0.1:8080;
+  }
+}
 
-nodeJS + NPM install
+<!-- Convert .ppk to .pem --> 
+puttygen bplnew.ppk -O private-openssh -o bplnew.pem
 
+
+<!-- nodeJS + NPM install -->
 sudo apt-get install python-software-properties
 sudo apt-add-repository ppa:chris-lea/node.js
 sudo apt-get update
@@ -187,7 +184,7 @@ php -v
 
 
 
-Hot Key Ubuntu
+<!-- Hot Key Ubuntu -->
 New tab -> Ctrl+T
 New window -> Ctrl+N
 New folder -> Shift+Ctrl+N
@@ -220,8 +217,8 @@ Go to specified location -> Ctrl+L
 Search files (find) -> Ctrl+F
 
 
-Create file: name.desktop and edit file with gedit
-
+===========================
+<!-- Create file: name.desktop and edit file with gedit -->
 [Desktop Entry]
 Version=1.0
 Name=GrooveNet (app name)
@@ -235,7 +232,9 @@ Categories=Utility;Application;
 Rename file to *.desktop
 Right click -> Properties -> permissions -> Check Allow executing file as program
 
-
 ============================
-PHP Storm 10
+<!-- PHP Storm 10 key -->
 http://idea.lanyus.com
+
+
+<!-- Unzip 
