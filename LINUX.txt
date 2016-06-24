@@ -237,4 +237,44 @@ Right click -> Properties -> permissions -> Check Allow executing file as progra
 http://idea.lanyus.com
 
 
-<!-- Unzip 
+Unzip 
+
+
+
+<!-- ============================ -->
+<!-- Monit -->
+sudo apt-get install monit
+monit --version
+
+Conmand:
+sudo /etc/init.d/monit start
+sudo /etc/init.d/monit restart
+sudo /etc/init.d/monit stop
+sudo monit start all
+sudo monit stop all
+sudo monit -t <!-- Check syntax -->
+sudo monit reload <!-- ReLoad monit config -->
+
+File config: /etc/monit/monitrc
+set httpd port 2812
+  use address localhost  # only accept connection from localhost
+  allow localhost       # allow localhost to connect to the server and
+  allow samuel:kong      # require user 'admin' with password 'monit'
+  allow @monit           # allow users of group 'monit' to connect (rw)
+  allow @users readonly  # allow users of group 'users' to connect readonly
+
+check process apache with pidfile /var/run/apache2/apache2.pid
+  start program = "/etc/init.d/apache2 start"
+  stop program  = "/etc/init.d/apache2 stop"
+  if failed host localhost port 80 
+    protocol apache-status dnslimit > 70%
+  then restart
+  if cpu > 80% for 5 cycles then restart
+  group server
+
+check process mysqld with pidfile /var/run/mysqld/mysqld.pid
+  group database
+  start program = "/etc/init.d/mysql start"
+  stop program = "/etc/init.d/mysql stop"
+  if failed host localhost port 3306 protocol mysql then restart
+

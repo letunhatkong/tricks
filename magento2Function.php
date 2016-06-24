@@ -360,3 +360,327 @@ Clear Cache.
 Change another theme and clear cache.
 Re-choose current theme and clear cache.
 
+
+<!-- Magento: Join, filter, select and sort attributes, fields and tables  -->
+<!-- http://blog.chapagain.com.np/magento-join-filter-select-and-sort-attributes-fields-and-tables/ -->
+addAttributeToFilter: adds WHERE clause on $attribute specified by $condition
+
+<?php
+/**
+* Add attribute filter to collection
+*
+* If $attribute is an array will add OR condition with following format:
+* array(
+* array(‘attribute’=>’firstname’, ‘like’=>’test%’),
+* array(‘attribute’=>’lastname’, ‘like’=>’test%’),
+* )
+*
+* @see self::_getConditionSql for $condition
+* @param Mage_Eav_Model_Entity_Attribute_Interface|integer|string|array $attribute
+* @param null|string|array $condition
+* @param string $operator
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+addAttributeToFilter($attribute, $condition=null, $joinType=’inner’)
+addAttributeToSelect: gets the value for $attribute in the SELECT clause; specify * to get all attributes (i.e. to execute SELECT *)
+
+/**
+* Add attribute to entities in collection
+*
+* If $attribute==’*’ select all attributes
+*
+* @param array|string|integer|Mage_Core_Model_Config_Element $attribute
+* @param false|string $joinType flag for joining attribute
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+addAttributeToSelect($attribute, $joinType=false)
+
+/* If an array is passed but no attribute code specified, it will be interpreted as a group of OR conditions that will be processed in the same way.
+If no attribute code is specified, it defaults to eq.*/
+
+$collection = Mage::getModel('catalog/product')->getCollection();
+// select all attributes
+$collection->addAttributeToSelect('*');
+// select specific attributes
+$collection->addAttributeToSelect(array('name', 'url_key', 'type_id'));
+// select only those items whose status = 1
+$collection->addAttributeToFilter('status', 1);
+// alternative to select only those items whose status = 1
+$collection->addAttributeToFilter('status', array('eq' => 1));
+// using LIKE statement
+$collection->addAttributeToFilter('sku', array('like' => '%CH%'));
+// using IN statement,
+// i.e. selecting only those items whose ID fall in the given array
+$collection->addAttributeToFilter('id', array('in' => array(1, 14, 51, 52)));
+// selecting only those items whose ID is greater than the given value
+$collection->addAttributeToFilter('id', array('gt' => 5));
+// select by date range
+$collection->addAttributeToFilter('date_field', array(
+    'from' => '10 September 2010',
+    'to' => '21 September 2010',
+    'date' => true, // specifies conversion of comparison values
+    ));
+// Add OR condition:
+$collection->addAttributeToFilter(array(
+    array(
+        'attribute' => 'field_name',
+        'in'        => array(1, 2, 3),
+        ),
+    array(
+        'attribute' => 'date_field',
+        'from'      => '2010-09-10',
+        ),
+    ));
+$collection = Mage::getModel('catalog/product')->getCollection(); 
+// select all attributes
+$collection->addAttributeToSelect('*'); 
+// select specific attributes
+$collection->addAttributeToSelect(array('name', 'url_key', 'type_id')); 
+// select only those items whose status = 1
+$collection->addAttributeToFilter('status', 1); 
+// alternative to select only those items whose status = 1
+$collection->addAttributeToFilter('status', array('eq' => 1)); 
+// using LIKE statement
+$collection->addAttributeToFilter('sku', array('like' => '%CH%')); 
+// using IN statement,
+// i.e. selecting only those items whose ID fall in the given array
+$collection->addAttributeToFilter('id', array('in' => array(1, 14, 51, 52)));
+ 
+// selecting only those items whose ID is greater than the given value
+$collection->addAttributeToFilter('id', array('gt' => 5));
+ 
+// select by date range
+$collection->addAttributeToFilter('date_field', array(
+    'from' => '10 September 2010',
+    'to' => '21 September 2010',
+    'date' => true, // specifies conversion of comparison values
+    ));
+ 
+// Add OR condition:
+$collection->addAttributeToFilter(array(
+    array(
+        'attribute' => 'field_name',
+        'in'        => array(1, 2, 3),
+        ),
+    array(
+        'attribute' => 'date_field',
+        'from'      => '2010-09-10',
+        ),
+    ));
+
+/**
+Below is the full filter condition codes with attribute code and its sql equivalent
+eq  :   =
+neq :   !=
+like :  LIKE
+nlike : NOT LIKE
+in  :   IN ()
+nin :   NOT IN ()
+is  :   IS
+notnull :   IS NOT NULL
+null :  IS NULL
+moreq : >=
+gt  :   >
+lt  :   <   gteq :  >=
+lteq :  <=  finset :    FIND_IN_SET()   from :  >=  (for use with dates)
+to  :   <=  (for use with dates) date : optional flag for use with from/to to specify that comparison value should first be converted to a date datetime :  optional flag for use with from/to to specify that comparison value should first be converted to a datetime
+*/
+
+/**
+* addFieldToFilter: alias for addAttributeToFilter(). This filters the database table fields.
+* Wrapper for compatibility with Varien_Data_Collection_Db
+*
+* @param mixed $attribute
+* @param mixed $condition
+*/
+addFieldToFilter($attribute, $condition=null)
+
+addAttributeToSort: adds ORDER BY clause on $attribute
+
+/**
+* Add attribute to sort order
+*
+* @param string $attribute
+* @param string $dir
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+addAttributeToSort($attribute, $dir=’asc’)
+
+
+/**
+* Add attribute expression (SUM, COUNT, etc)
+*
+* addExpressionAttributeToSelect: adds SQL expression $expression, using $alias, to SELECT clause (typically containing aggregate functions such as SUM(), COUNT()); when $attribute specifies a single attribute as a string, $expression can reference the attribute as simply {{attribute}}, but when passing an array of attributes, each attribute must be referenced in $expression by the name of the specific attribute;
+*
+* Example: (‘sub_total’, ‘SUM({{attribute}})’, ‘revenue’)
+* Example: (‘sub_total’, ‘SUM({{revenue}})’, ‘revenue’)
+*
+* For some functions like SUM use groupByAttribute.
+*
+* @param string $alias
+* @param string $expression
+* @param string $attribute
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+addExpressionAttributeToSelect($alias, $expression, $attribute)
+
+
+/**
+* groupByAttribute: adds $attribute to GROUP BY clause
+* Groups results by specified attribute
+*
+* @param string|array $attribute
+*/
+groupByAttribute($attribute)
+
+/**
+* 
+joinAttribute: joins another entity and adds attribute from joined entity, using $alias, to SELECT clause.
+Here are the parameters for joinAttribute function:-
+$alias = selected field name. You can keep it’s name whatever you want.
+$attribute = joined entity type code and attribute code = entity_type_code/attribute_code
+entity_type_code is present in eav_entity_type table
+attribute_code is present in eav_attribute table
+attribute_code is attribute of the corresponding entity you want to select out.
+$bind = attribute code of the main entity to link to the joined entity.
+$filter = primary key for the joined entity (entity_id default)
+*
+* Add attribute from joined entity to select
+*
+* Examples:
+* (‘billing_firstname’, ‘customer_address/firstname’, ‘default_billing’)
+* (‘billing_lastname’, ‘customer_address/lastname’, ‘default_billing’)
+* (‘shipping_lastname’, ‘customer_address/lastname’, ‘default_billing’)
+* (‘shipping_postalcode’, ‘customer_address/postalcode’, ‘default_shipping’)
+* (‘shipping_city’, $cityAttribute, ‘default_shipping’)
+*
+* Developer is encouraged to use existing instances of attributes and entities
+* After first use of string entity name it will be cached in the collection
+*
+* @todo connect between joined attributes of same entity
+* @param string $alias alias for the joined attribute
+* @param string|Mage_Eav_Model_Entity_Attribute_Abstract $attribute
+* @param string $bind attribute of the main entity to link with joined $filter
+* @param string $filter primary key for the joined entity (entity_id default)
+* @param string $joinType inner|left
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+joinAttribute($alias, $attribute, $bind, $filter=null, $joinType=’inner’, $storeId=null)
+
+
+/**
+* joinTable: joins table $table
+Here are the parameters of the function joinTable:-
+$table = table name to join
+$bind = ( parent_key = foreign_key )
+$fields = array of fields to select
+$cond = where condition
+$joinType = join type
+*
+* @param string|array $table
+* @param string $bind
+* @param string|array $fields
+* @param null|array $cond
+* @param string $joinType
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+joinTable($table, $bind, $fields=null, $cond=null, $joinType=’inner’)
+
+Using joinAttribute and joinTable
+In the code below, all order invoice items are selected, i.e. all products that have been invoiced.
+joinTable is used to join sales_order_entity table to fetch increment_id and store_id of the invoice for each product.
+joinAttribute is used to fetch order_id, product_name, and store_id.
+joinTable is used again to fetch the order status of each invoice item.
+
+$collection = Mage::getModel('sales/order_invoice_item')
+    ->getCollection()
+    ->joinTable('sales_order_entity', 'entity_id=parent_id', array('invoice_id'=>'increment_id', 'store_id' => 'store_id'), null , 'left')
+    ->joinAttribute('order_id', 'invoice/order_id', 'parent_id', null, 'left')
+    ->joinAttribute('product_name', 'invoice_item/name', 'entity_id', null, 'left')
+    ->joinAttribute('store_id', 'invoice/store_id', 'parent_id', null, 'left')
+    ->joinTable('sales_order', 'entity_id=order_id', array('order_status'=>'status'), null , 'left')
+    ;
+
+$collection = Mage::getModel('sales/order_invoice_item')
+    ->getCollection()
+    ->joinTable('sales_order_entity', 'entity_id=parent_id', array('invoice_id'=>'increment_id', 'store_id' => 'store_id'), null , 'left')
+    ->joinAttribute('order_id', 'invoice/order_id', 'parent_id', null, 'left')
+    ->joinAttribute('product_name', 'invoice_item/name', 'entity_id', null, 'left')
+    ->joinAttribute('store_id', 'invoice/store_id', 'parent_id', null, 'left')
+    ->joinTable('sales_order', 'entity_id=order_id', array('order_status'=>'status'), null , 'left')
+    ;
+
+
+
+/**
+joinField: joins regular table field using an attribute as foreign key
+* Join regular table field and use an attribute as fk
+*
+* Examples:
+* (‘country_name’, ‘directory/country_name’, ‘name’, ‘country_id=shipping_country’, “{{table}}.language_code=’en'”, ‘left’)
+*
+* @param string $alias ‘country_name’
+* @param string $table ‘directory/country_name’
+* @param string $field ‘name’
+* @param string $bind ‘PK(country_id)=FK(shipping_country_id)’
+* @param string|array $cond “{{table}}.language_code=’en'” OR array(‘language_code’=>’en’)
+* @param string $joinType ‘left’
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+joinField($alias, $table, $field, $bind, $cond=null, $joinType=’inner’)
+
+/**
+removeAttributeToSelect: removes $attribute from SELECT clause; specify null to remove all attributes
+* Remove an attribute from selection list
+*
+* @param string $attribute
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+removeAttributeToSelect($attribute=null)
+
+/**
+setPage: sets LIMIT clause by specifying page number (one-indexed) and number of records per page; equivalent to calling setCurPage($pageNum) and setPageSize($pageSize)
+* Set collection page start and records to show
+*
+* @param integer $pageNum
+* @param integer $pageSize
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+setPage($pageNum, $pageSize)
+
+/**
+importFromArray: imports 2D array into collection as objects
+* Import 2D array into collection as objects
+*
+* If the imported items already exist, update the data for existing objects
+*
+* @param array $arr
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+importFromArray($arr)
+
+
+
+/**
+exportToArray: returns collection data as a 2D array
+* Get collection data as a 2D array
+*
+* @return array
+*/
+exportToArray()
+
+
+/**
+setOrder: alias for addAttributeToSort() q.v., identical except that it can accept array of attributes, and default $dir is desc
+* Set sorting order
+*
+* $attribute can also be an array of attributes
+*
+* @param string|array $attribute
+* @param string $dir
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+setOrder($attribute, $dir=’desc’)
+
+
+
