@@ -3,10 +3,19 @@ sudo php bin/magento indexer:reindex
 
 <!-- Re-DEPLOY -->
 sudo php bin/magento setup:static-content:deploy
+M2 có 2 chế độ symlink and copy. deploy content => copy.
+Nếu M2 ko tự động tạo symlink khi F5 page thì có nghĩa là cần xem lại file .htaccess của thư mục pub/static
+Del pub/static/* && var/view_preprocessed
+https://github.com/magento/magento2/blob/develop/pub/static/.htaccess
 
 <!-- CLEAR CACHE -->
 Go to magento folder and type: php bin/magento cache:clean
 sudo php bin/magento cache:clean
+
+<!-- Show mode -->
+sudo php bin/magento deploy:mode:show
+sudo php bin/magento deploy:mode:set developer
+sudo php bin/magento deploy:mode:set production
 
 <!-- Upgrade -->
 sudo php bin/magento setup:upgrade
@@ -97,6 +106,15 @@ $promotionId = $category->getId() ? $category->getId() : 0;
 echo $promotionId;
 ?>
 
+<!-- Get Parent Product from child product -->
+<?php
+$_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$parentProduct = $_objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable');
+
+$parentId = $parentProduct->getParentIdsByChild($_product->getId());
+$parentId = (isset($parentId[0])) ? 0:$parentId[0];
+
+?>
 
 <?php // Get Latest Products
 $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -147,7 +165,9 @@ $promo = $promotionCollection->create()
     });
 </script>
 
-
+<!-- Newsletter -->
+https://www.fastcomet.com/tutorials/magento2/newsletters
+http://blog.belvg.com/newsletters-in-magento-2-0.html
 
 <!-- Layout -->
 <!-- Banner home -->

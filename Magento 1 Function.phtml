@@ -196,10 +196,8 @@ sudo a2enmod rewrite
 sudo php5enmod mcrypt
 
 mysql -u root -p
-CREATE DATABASE magento;
-CREATE USER magento_user@localhost IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON magento.* TO magento_user@localhost IDENTIFIED BY 'password';
-FLUSH PRIVILEGES;
+CREATE DATABASE mone;
+CREATE USER mone@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON mone.* TO mone@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
 exit
 
 Copy magento folder to this path /var/www/html/
@@ -208,8 +206,7 @@ Permission folder
 sudo find /var/www/html/magentoInstallationFolder/ -type d -exec chmod 775 {} \;
 sudo find /var/www/html/magentoInstallationFolder/ -type f -exec chmod 664 {} \;
 
-sudo find -type d -exec chmod 775 {} \;
-sudo find -type f -exec chmod 664 {} \;
+sudo find -type d -exec chmod 775 {} \; &&  sudo find -type f -exec chmod 664 {} \; && sudo chmod -R 777 var/  media/ app/etc/ downloader/;
 
 Set Writable for 3 folders in root magento: var, media, app/etc
 sudo chmod -R 777 var/  media/ app/etc/ downloader/

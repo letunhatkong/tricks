@@ -5,6 +5,26 @@
     -webkit-text-size-adjust: 100%;
 }
 
+/* Toán tử CSS */
+#abc + div : CSS cho thẻ div đầu tiên sau thành phần có id #abc. Div không nằm trong #abc.
+#abc ~ div : CSS cho tất cả thẻ div sau thành phần có id #abc. Div không nằm trong #abc.
+[title~=flower] : Chọn tất cả thành phần mà thuộc tính title chứa từ "flower"
+[lang|=en]  Selects all elements with a lang attribute value starting with "en"
+a[href^="https"]    Selects every <a> element whose href attribute value begins with "https"    3
+a[href$=".pdf"] Selects every <a> element whose href attribute value ends with ".pdf"   3
+a[href*="w3schools"]    Selects every <a> element whose href attribute value contains the substring "w3schools"
+p::first-letter Selects the first letter of every <p> element   1
+p::first-line   Selects the first line of every <p> element
+:not(p) Selects every element that is not a <p> element
+
+Các đơn vị tương đối được sử dụng trong CSS gồm có:
+px: đơn vị tuyệt đối (tương đương 1 điểm ảnh).
+pt: đơn vị tuyệt đối (1 inch = 72pt)
+%: Là đơn vị tham chiếu tỷ lệ so với một phần tử mẹ của nó dựa vào kích thước. Ví dụ bạn có một cái khung với kích thước là 500px và khung bên trong có kích thước là 50% thì nó sẽ là 250px. Nếu bạn sử dụng đơn vị phần trăm này để gán kích thước cho thẻ <html> trên website thì nó sẽ thay đổi theo kích thước màn hình hoặc/cửa sổ website.
+em: Là đơn vị tham chiếu tỷ lệ so với phần tử mẹ của nó dựa vào giá trị của thuộc tính font-size. Ví dụ bạn đặt cho font-size cho phần tử mẹ của nó là 19px thì nếu bạn sử dụng em trong khu vực phần tử đó thì 1em = 19px.
+rem: Là đơn vị tham chiếu tỷ lệ so với phần tử gốc của một website dựa vào thuộc tính font-size của thẻ <html>, nghĩa là sẽ biến đổi tùy theo giá trị của thuộc tính font-size trong thẻ <html>. Cũng như rem, nếu bạn khai báo font-size cho thẻ <html> là 16px thì 1rem = 16px. 
+
+
 /*Create triangle*/
 .triangle {
     width: 0;
@@ -200,21 +220,3 @@ div.parent .centerDiv {
     border-bottom: 80px solid transparent;
 }
 
-/* Toán tử CSS */
-#abc + div : CSS cho thẻ div đầu tiên sau thành phần có id #abc. Div không nằm trong #abc.
-#abc ~ div : CSS cho tất cả thẻ div sau thành phần có id #abc. Div không nằm trong #abc.
-[title~=flower] : Chọn tất cả thành phần mà thuộc tính title chứa từ "flower"
-[lang|=en]  Selects all elements with a lang attribute value starting with "en"
-a[href^="https"]    Selects every <a> element whose href attribute value begins with "https"    3
-a[href$=".pdf"] Selects every <a> element whose href attribute value ends with ".pdf"   3
-a[href*="w3schools"]    Selects every <a> element whose href attribute value contains the substring "w3schools"
-p::first-letter Selects the first letter of every <p> element   1
-p::first-line   Selects the first line of every <p> element
-:not(p) Selects every element that is not a <p> element
-
-Các đơn vị tương đối được sử dụng trong CSS gồm có:
-px: đơn vị tuyệt đối (tương đương 1 điểm ảnh).
-pt: đơn vị tuyệt đối (1 inch = 72pt)
-%: Là đơn vị tham chiếu tỷ lệ so với một phần tử mẹ của nó dựa vào kích thước. Ví dụ bạn có một cái khung với kích thước là 500px và khung bên trong có kích thước là 50% thì nó sẽ là 250px. Nếu bạn sử dụng đơn vị phần trăm này để gán kích thước cho thẻ <html> trên website thì nó sẽ thay đổi theo kích thước màn hình hoặc/cửa sổ website.
-em: Là đơn vị tham chiếu tỷ lệ so với phần tử mẹ của nó dựa vào giá trị của thuộc tính font-size. Ví dụ bạn đặt cho font-size cho phần tử mẹ của nó là 19px thì nếu bạn sử dụng em trong khu vực phần tử đó thì 1em = 19px.
-rem: Là đơn vị tham chiếu tỷ lệ so với phần tử gốc của một website dựa vào thuộc tính font-size của thẻ <html>, nghĩa là sẽ biến đổi tùy theo giá trị của thuộc tính font-size trong thẻ <html>. Cũng như rem, nếu bạn khai báo font-size cho thẻ <html> là 16px thì 1rem = 16px. 
