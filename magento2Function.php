@@ -11,6 +11,9 @@ https://github.com/magento/magento2/blob/develop/pub/static/.htaccess
 <!-- CLEAR CACHE -->
 Go to magento folder and type: php bin/magento cache:clean
 sudo php bin/magento cache:clean
+sudo php bin/magento cache:fluid
+Edit code trong html 
+sudo rm -rf var/cache/ var/page_cache/ var/view_preprocessed/ var/composer_home/  pub/static/* var/generation/ var/di
 
 <!-- Show mode -->
 sudo php bin/magento deploy:mode:show
@@ -31,7 +34,7 @@ DROP TABLE IF EXISTS magefan_blog_category, magefan_blog_category_store;
 DELETE FROM setup_module WHERE module = "Magefan_Blog";
 sudo php bin/magento module:uninstall Magentostudy_News --backup-code --backup-media --backup-db --clear-static-content
 <!-- Disable Module -->
-sudo php bin/magento module:disable Magentostudy_News
+sudo php bin/magento module:disable Lexim_Catalog
 <!-- Enable Module -->
 php bin/magento module:enable Sahy_Banner --clear-static-content
 
@@ -122,6 +125,7 @@ $productCollection = $_objectManager->create('Magento\Catalog\Model\ResourceMode
 $collection = $productCollection->create()
     ->addAttributeToSelect('*')
     ->addFieldToFilter("status", "1")
+    ->addFieldToFilter("type_id", array('neq' => 'configurable'))
     ->setOrder('created_at', 'DESC')
     ->setPageSize(12) // Limit product
     ->load();
@@ -237,7 +241,7 @@ Link step by step: http://devdocs.magento.com/guides/v2.0/install-gde/bk-install
 
 1/ Install apache2, mySQL, PHP
 apache -v (2.2 or 2.4)
-sudo apt-get install apache2
+sudo apt-get install apache2 zip
 php -v (>= 5.5.22 or 5.6.x)
 
 
@@ -250,23 +254,24 @@ INSTALL PHP 5.6.x
 sudo apt-get -y update
 sudo add-apt-repository ppa:ondrej/php5-5.6
 sudo apt-get -y update
-sudo apt-get -y install php5 php5-common php5-mcrypt php5-curl php5-cli php5-mysql php5-gd php5-intl php5-xsl libapache2-mod-php5 libcurl3 
+sudo apt-get -y install php5 php5-common php5-mcrypt php5-curl php5-cli php5-mysql php5-gd php5-intl php5-xsl libapache2-mod-php5 libcurl3 php5-imagick
 sudo apt-get install mysql-server-5.6 php5-mysql
 
 INSTALL imagemagick
-sudo apt-get install php5-imagick
+sudo apt-get install php5-imagick zip
 
 curl --version (>= 7.34)
 
 3/ Config memory_limit of PHP
 Ubuntu: /etc/php5/cli/php.ini and /etc/php5/apache2/php.ini
+/etc/php/7.0/cli/php.ini and /etc/php/7.0/apache2/php.ini
 
 memory_limit = 768M or 1G
 post_max_size 100M
-always_populate_raw_post_data = -1
+always_populate_raw_post_data = -1 (removed on php7)
 upload_max_filesize 100M
 
-mod_rewrite module must be enabled: a2enmod rewrite
+mod_rewrite module must be enabled: sudo a2enmod rewrite
 Save your changes and Restart Apache: sudo service apache2 restart
 
 4/ Create vitrual machine
@@ -305,7 +310,7 @@ sudo service apache2 restart
 
 5/ Create DATABASE
 mysql -u root -p
-CREATE DATABASE siva; CREATE USER siva@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON siva.* TO siva@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES; 
+CREATE DATABASE wrm2; CREATE USER wrm2@localhost IDENTIFIED BY 'Password$1'; GRANT ALL PRIVILEGES ON wrm2.* TO wrm2@localhost IDENTIFIED BY 'Password$1'; FLUSH PRIVILEGES; 
 
 6/ Autoload error - Vendor autoload is not found. Please run 'composer install' under application root directory.
 sudo apt-get update
@@ -380,6 +385,10 @@ Clear Cache.
 Change another theme and clear cache.
 Re-choose current theme and clear cache.
 
+
+<!-- Edit EAV Product Attributes -->
+1. Find Id of Attribute: eav_attribute 19
+2. Check id in: catalog_eav_attribute
 
 <!-- Magento: Join, filter, select and sort attributes, fields and tables  -->
 <!-- http://blog.chapagain.com.np/magento-join-filter-select-and-sort-attributes-fields-and-tables/ -->
