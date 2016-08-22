@@ -1,0 +1,76 @@
+<!-- JW Video -->
+<div id="jwVideo"></div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+
+    	// appName: tên đăng nhập của server FTP
+		var appName = 'bdkkkqd';	
+		// pass qui ước từ bên cung cấp dịch vụ VoD, không phải pass của FTP server
+		var pass = 'lien-he-lay-pass'; 
+
+		// Ví dụ đẩy file demo.mp4 lên server FTP
+		var file_Path = 'demo.mp4';
+		// fix_Path : thành phần thứ 2 trong chuỗi string, dùng để tính md5
+		var fix_Path = 'bdkkkqd/' + file_Path.split('.')[0].split('-')[0];
+		// tách file_Path theo dấu "." lấy thành phần đầu tiên rồi
+		// tách theo dấu "-" lấy thành phần đầu tiên.		
+
+		// nxswjzsg : Host name mà bên CDN cung cấp cho dịch vụ VoD
+		// bdkkkqd : tên đăng nhập server FTP = appName
+		var url0 = 'http://nxswjzsg.cdnviet.com/bdkkkqd/_definst_/mp4:bdkkkqd/';
+		var url2 = '/playlist.m3u8?t=';
+
+		// time: thời điểm link hết hoạt động (tính bằng giây)
+        var time = new Date().getTime() / 1000;
+        time = parseInt(time) + 36000; 
+        // 36000 giây = 10h: là thời gian tồn tại của link (có thể dùng khác 36000)
+
+        // Get IP Client 
+        function myIP() {
+            if (window.XMLHttpRequest) xmlhttp = new XMLHttpRequest();
+            else xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            xmlhttp.open("GET","http://api.hostip.info/get_html.php",false);
+            xmlhttp.send();
+            hostipInfo = xmlhttp.responseText.split("\n");
+            for (i=0; hostipInfo.length >= i; i++) {
+                ipAddress = hostipInfo[i].split(":");
+                if ( ipAddress[0] == "IP" ) return ipAddress[1];
+            }
+            return false;
+        }
+        var myIp = myIP();
+        console.log('Client IP: '+ myIp); 
+
+        // string: chuỗi string mình cần tính md5, sẽ giống với chuỗi string mà dịch vụ VoD tính 
+ 		var string = appName + ':'+ fix_Path + ':' + myIp + ':' + time + ':' + pass; 
+
+ 		// tính md5 của chuỗi string trên
+        var md5token = md5(string);        
+
+        // link play video (VoD)
+        var link = url0 + file_Path + url2 + md5token + '&e=' + time;
+        console.log('Link web: '+link);
+
+        // Cấu hình JW Player (6.12 Ads Edition)        
+        jwplayer("jwVideo").setup({
+            file: link,
+            width: '100%',
+            aspectratio: '16:9',
+            autostart: "true",
+            androidhls: "true",
+            skin: "beelden"
+        });
+
+        // Kết quả mong đợi sẽ như thế này
+        // Client IP: 113.123.226.75
+		// File Path: demo.mp4
+		// Fix Path : bdkkkqd/demo
+		// Time : 1425391056
+		// string : bdkkkqd:bdkkkqd/demo:113.123.226.75:1425391056:passLienHe
+		// md5 string: 9ac8e064d32c1bcdc496a90981870d42
+		// Link: http://nxswjzsg.cdnviet.com/bdkkkqd/_definst_/mp4:bdkkkqd/demo.mp4/playlist.m3u8?t=9ac8e064d32c1bcdc496a90981870d42&e=1425391056
+   
+    })
+</script>
+<!-- # JW Video -->

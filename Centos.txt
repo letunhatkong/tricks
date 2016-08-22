@@ -1,0 +1,20 @@
+
+
+Command APACHE
+/etc/init.d/httpd start
+/etc/init.d/httpd stop
+/etc/init.d/httpd restart
+/etc/init.d/httpd status
+
+MySQL
+/etc/init.d/mysqld start
+/etc/init.d/mysqld stop
+/etc/init.d/mysqld restart
+/etc/init.d/mysqld status
+
+
+
+
+
+
+
