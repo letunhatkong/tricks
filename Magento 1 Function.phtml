@@ -94,7 +94,27 @@ $currentUrl = Mage::helper('core/url')->getCurrentUrl();
 $url = Mage::getSingleton('core/url')->parseUrl($currentUrl);
 $path = $url->getPath();
 
+// Sort by in list page
+/** catalog/product/list/toolbar.phtml **/
+$toolbar = Mage::getBlockSingleton('catalog/product_list_toolbar');
+$s = $toolbar->getCurrentOrder();
+$d = $toolbar->getCurrentDirection(); 
+$this->getOrderUrl('name', 'asc'); // Link url sort 
+$this->getOrderUrl('price', 'desc'); // Link url sort
 
+public function setDefaultOrder($field)
+{
+    if (isset($this->_availableOrder[$field])) {
+        $this->_availableOrder = array(
+            'recentlyadded' => $this->__('Recently Added'),
+            'name' => $this->__('Name'),
+            'price' => $this->__('Price'),
+            'created_at' => $this->__('Created Date')
+        );
+        $this->_orderField = $field;
+    }
+    return $this;
+}
 
 /**
  * Get MSRP Price ( Manufacturer’s Suggested Retail Price ) Magento
@@ -111,12 +131,19 @@ $_msrpPrice = $this->helper('core')->currency($_product->getMsrp(),true,true);
 $this->getLayout()->createBlock('cms/block')->setBlockId('block_detail_right_1')->toHtml()
 
 
-/** *
- * Get order detail in magento
- * https://universalcoder.wordpress.com/2014/03/20/custom-thank-you-page-in-magento-success-phtml/
- * https://universalcoder.wordpress.com/2014/03/21/custom-thank-you-page-in-magento-success-phtml-part-2/
- */
 
+
+
+
+/**
+ * Call static block from code
+ */
+// open up /app/code/core/Mage/Paygate/Model/Authorizenet.php
+// find code
+const CGI_URL_TD = 'https://apitest.authorize.net/xml/v1/request.api';
+// and replace the url with
+const CGI_URL_TD = 'https://api.authorize.net/xml/v1/request.api';
+// Then go to your magento admin sales->order , click on any order status with “Suspected 
 
 
 ?>
@@ -176,28 +203,35 @@ sudo apt-get install php5 libapache2-mod-php5 php5-mcrypt libcurl3 php5-curl php
 sudo nano /etc/apache2/mods-enabled/dir.conf
 Change line: DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
 
-sudo nano /etc/apache2/sites-available/magento.conf
+sudo nano /etc/apache2/sites-available/wrm1.conf
 
-< VirtualHost *:80 >
-DocumentRoot /var/www/html
-< Directory /var/www/html/  >
+<VirtualHost wrm1.vn:80>
+    ServerAdmin wrm1@localhost
+    DocumentRoot /var/www/html/wrm1
+    ServerName wrm1.vn
 
-Options Indexes FollowSymLinks MultiViews
-AllowOverride All
-<  / Directory >
-< / VirtualHost >
+    <Directory /var/www/html/wrm1>
+        Allow from all
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Order allow,deny
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/wrm1-log.log
+    CustomLog ${APACHE_LOG_DIR}/wrm1-access.log combined
+
+</VirtualHost>
 
 
 
-sudo a2ensite magento.conf
+sudo a2ensite wrm1.conf
 sudo a2dissite 000-default.conf
 
 sudo a2enmod rewrite
 sudo php5enmod mcrypt
 
 mysql -u root -p
-CREATE DATABASE mone;
-CREATE USER mone@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON mone.* TO mone@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
+CREATE DATABASE wrm1; CREATE USER wrm1@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON wrm1.* TO wrm1@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
 exit
 
 Copy magento folder to this path /var/www/html/

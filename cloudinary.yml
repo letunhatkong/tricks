@@ -1,0 +1,21 @@
+Email: letunhatkong@gmail.com 
+Pass: internase
+---
+development:
+  cloud_name: lexim
+  api_key: '497234775979257'
+  api_secret: puilhKlT2mAyJMAmHdizLrJQKVQ
+  enhance_image_tag: true
+  static_image_support: false
+production:
+  cloud_name: lexim
+  api_key: '497234775979257'
+  api_secret: puilhKlT2mAyJMAmHdizLrJQKVQ
+  enhance_image_tag: true
+  static_image_support: true
+test:
+  cloud_name: lexim
+  api_key: '497234775979257'
+  api_secret: puilhKlT2mAyJMAmHdizLrJQKVQ
+  enhance_image_tag: true
+  static_image_support: false

@@ -1,0 +1,18 @@
+
+https://console.developers.google.com
+Create a new app
+
+Project ID lookbook-141807
+Project number 753162328332
+{
+  "type": "service_account",
+  "project_id": "lookbook-141807",
+  "private_key_id": "cecdbb3a09528efc49a0067f320e49d562767cf1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEwAIBADANBgkqhkiG9w0BAQEFAASCBKowggSmAgEAAoIBAQD2MNmRvq8uG92F\nDO/FATPCXry9Lnfef+E6idcjIPGWmMG/DjGFE98sjoXKgiFSL4TxQPNwlSleb8B3\n1cm+pSuwPeON9oByh4M8kBxlsqqfMd0tuigbNmn1+1UiMO8CVLfQwopFVbaXK1eW\nxgClH0UPROLAypcVKCyuQ7REWEVFktmXdSAWIbN1swNbQRskty57Kqswltusnmzw\nmOb4Cfen+mX3nVBqVzcHme4MyljrUn+WNauWWwR0XG0rsrIggTsI36nFqFRc5Wks\nxDswLsBZdrjKVYKjpihZdXnNCC0Ko0+KVL+Pi1VO3khn3omjc4jDnEcJ8aecZ6Hm\nJLBBDgmxAgMBAAECggEBAO3JmRvQldtvRrLwH9akpp2ia6I+c8EQuzaTVJy1gSL4\nQIqM5v+mhfS/ZDKJJi3/f+SV24xuRhrUzY3xjH77ggske9nusXntsbCZcRQ5UduZ\nigxUtdAy6n2QWFZB9VjHAxQ8EtmNRGMWle8nKBBU95sb6fhUtUDWIPHgqwkoSSA8\nJb4Syqjn/+l6VxSoxBmo5lPCPv2FkxlqgPlDydcYtYO6UsJk/AHKIIWSfl5IEs/S\nLKEE977ztMyvFAo+4GXjk0QafSSXx9lftXsMnMsXgSWvXZx43nkk+lr3/vIhnkY3\nhJGoIVO4Dey5IQW6g6133uebW/0XLBg9mhH4wAu2gAECgYEA/G4tV+9KOispKOeE\nU17Wni/JDbg63s30zi0O/NRlhBAjSz5hDFQRhkMSIw7iIYjF6m3jpUzcRVwehQie\nAsm8GU2vTO0vVYCQbSkZGIszZroFVmZc5hxicDp5UxW70Pffzlj89x4ucSRGu94l\nO9WYtKs+Ah1hCTc1TrNUmLQrGgECgYEA+awVvl2rtj1o7lZs6WlCnLMSuargqyG9\n6Z2NXSloQTNAsoZolMAKYGK+rngAL6ceg1FOafxhwiaK8Dx/yB5xKzZSFif2XXFK\nfX/h+cyEXiXGK6X+z7yFbpS2EKRedcNPv1b72oNYlOFMUbUD49yHc3jzmaQQM5Cw\ngw00zSq7D7ECgYEAwM8/Hy2NWsTg2XeNIUkNUSJaxXn0rX5PALR2ADQTnj3dV3m8\nEvibshvE3LZfjxGzao6pFPeSQABO53pfhu2kGQe3YGDCiOJ8boS3wIGCr3Ji5U2m\no7UGk4Z2aTnujXznm+tovTB2dMEqrhDOC9fongc2g9MA7VMYCpb7hPAJBAECgYEA\nhpojztGpNUK+Q2AMr3m0E87nFXnuTdSPEleCUutz7VK4Wobj8u3lqjkSG/VOBGLQ\nrHM1FyadfZJR7VpweW8QC//pGVDKHW5qfmZnaci8xBURVY7UZSJ5vTgnP6md01dM\nsxcuCIwvQXSFNLemNT47OCHJEtfEdEhZIQ4JnWKgHsECgYEAyrWFY3jjgfE92MBC\nujmJZ0azW3eV77kCru2AQK/pjoYq/S3nlhXZqpy791fZq8k2F6njK0ftu/fuGhef\nbwe4m1htP137e08vJb+vV+ZFf3UkAIdiHFqo9Qjc8qOKnydzE4WskODYZz6JzM3B\nUVHALA5J9dcdm7yO+krbSdnkFBc=\n-----END PRIVATE KEY-----\n",
+  "client_email": "lookbook-141807@appspot.gserviceaccount.com",
+  "client_id": "100560583116104775622",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/lookbook-141807%40appspot.gserviceaccount.com"
+}

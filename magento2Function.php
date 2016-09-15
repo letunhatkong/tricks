@@ -236,6 +236,10 @@ http://blog.belvg.com/newsletters-in-magento-2-0.html
 <referenceBlock name="wish-list-link" remove="true" />          <!--for WishList Link-->
 <referenceBlock name="my-account-link" remove="true" />         <!--for My Account Link-->
 
+<!-- Set Tax Shipping price -->
+Flat Rate: Set Highest shippping price for international.
+Marketing -> Promotions -> Cart Price Rules: Set discount by countries 
+
 Install MAGENTO 2
 Link step by step: http://devdocs.magento.com/guides/v2.0/install-gde/bk-install-guide.html
 

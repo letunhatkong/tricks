@@ -49,8 +49,15 @@ sudo apt-get install python-software-properties
 sudo apt-add-repository ppa:chris-lea/node.js
 sudo apt-get update
 sudo apt-get install nodejs
-node -v
-npm -v
+
+6.x
+sudo apt-get install python-software-properties
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install nodejs
+
+4.x
+curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
 Or (Recommended):
 sudo apt-get install nodejs
@@ -59,6 +66,16 @@ sudo apt-get install npm
 Check:
 node -v
 npm -v
+
+Remove nodejs
+sudo apt-get --purge remove nodejs
+sudo apt-get autoremove
+sudo apt-get purge nodejs && sudo apt-get autoremove && sudo apt-get autoclean
+
+update node:
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable 
 
 If you type "node -v" and receive a message: The program 'node' can be found in the following packages. Step by step:
 1. Run: which node
@@ -72,6 +89,7 @@ sudo ln -s /usr/bin/nodejs /usr/bin/node
 OR
 sudo ln -s /usr/bin/nodejs /usr/sbin/node
 Re-check: node -v
+sudo ln -s thu_muc_se_symlink_toi thu_muc_symlink
 
 
 ===========================================================

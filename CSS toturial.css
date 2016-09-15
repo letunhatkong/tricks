@@ -36,6 +36,10 @@ rem: Là đơn vị tham chiếu tỷ lệ so với phần tử gốc của mộ
     border-bottom: 5px solid transparent;
 }
 
+/* < > CSS */
+.leftIcon { content: "\f053" or "\f104";  }
+.rightIcon { content: "\f054" or "\f105"}
+
 /*Tạo hiệu ứng răng cưa CSS*/
 .paper:after {
     content: "";

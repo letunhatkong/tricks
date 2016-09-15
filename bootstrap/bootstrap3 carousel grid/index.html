@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-grid.css">
+
+    <!-- Vertical -->
+    <style type="text/css">
+
+    </style>
+    <!--  -->
+
+    <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="js/carousel.js"></script>
+</head>
+<body>
+    <div style="width: 80%; margin: 0 auto; position: relative;">
+        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-animation="false" data-interval="false">
+       
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner" role="listbox">
+                <div class="item active">
+                    <div><img src="img/01.jpg" /></div>      
+                    <div><img src="img/02.jpg" /></div>         
+                    <div><img src="img/03.jpg" /></div>    
+                    <div><img src="img/04.jpg" /></div> 
+                </div>
+                <div class="item">
+                    <div><img src="img/03.jpg" /></div>      
+                    <div><img src="img/02.jpg" /></div>         
+                    <div><img src="img/01.jpg" /></div>    
+                    <div><img src="img/04.jpg" /></div> 
+                </div>
+                <div class="item">
+                    <div><img src="img/04.jpg" /></div>      
+                    <div><img src="img/03.jpg" /></div>         
+                    <div><img src="img/01.jpg" /></div>    
+                    <div><img src="img/02.jpg" /></div> 
+                </div>
+            </div>
+
+           <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+            </ol>
+
+            <!-- Controls -->
+            <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                <div class="iconTop"></div>
+                <!-- <span>Previous</span> -->
+            </a>
+            <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+                <div class="iconTop"></div>
+                <!-- <span>Next</span> -->
+            </a>
+        </div>
+
+    </div>
+</body>
+</html>
