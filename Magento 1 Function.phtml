@@ -1,3 +1,12 @@
+
+
+<?= $this->getLayout()->createBlock('cms/block')->setBlockId('sub-main-banner-red')->toHtml(); 
+echo $this->getLayout()->createBlock('newsletter/subscribe')->setTemplate('newsletter/subscribepopup.phtml')->toHtml();
+
+?>
+{{block type="core/template" name="homePageBlock" template="page/html/home.phtml"}}
+
+
 <?php
 /**
  * Create custom attribute in magento
@@ -91,8 +100,8 @@ $product->getStockItem()->getIsInStock();
 
 //Get Current link url Magento
 $currentUrl = Mage::helper('core/url')->getCurrentUrl();
-$url = Mage::getSingleton('core/url')->parseUrl($currentUrl);
-$path = $url->getPath();
+$path = Mage::getSingleton('core/url')->parseUrl($currentUrl)->getPath();
+$baseUrl = Mage::getBaseUrl();
 
 // Sort by in list page
 /** catalog/product/list/toolbar.phtml **/
@@ -125,19 +134,6 @@ public function setDefaultOrder($field)
 $_msrpPrice = $this->helper('core')->currency($_product->getMsrp(),true,true);
 
 
-/**
- * Call static block from code
- */
-$this->getLayout()->createBlock('cms/block')->setBlockId('block_detail_right_1')->toHtml()
-
-
-
-
-
-
-/**
- * Call static block from code
- */
 // open up /app/code/core/Mage/Paygate/Model/Authorizenet.php
 // find code
 const CGI_URL_TD = 'https://apitest.authorize.net/xml/v1/request.api';
@@ -145,6 +141,28 @@ const CGI_URL_TD = 'https://apitest.authorize.net/xml/v1/request.api';
 const CGI_URL_TD = 'https://api.authorize.net/xml/v1/request.api';
 // Then go to your magento admin sales->order , click on any order status with “Suspected 
 
+
+//  Remove link in dashboard page. /template/customer/account/navigation.phtml
+$_count = count($_links); /* Add or Remove Account Left Navigation Links Here -*/
+
+unset($_links['account']);
+unset($_links['account_edit']);
+unset($_links['address_book']);
+unset($_links['orders']);
+unset($_links['billing_agreements']); /* Billing Agreements */
+unset($_links['recurring_profiles']); /* Recurring Profiles */
+unset($_links['reviews']);
+unset($_links['tags']); /* My Tags */
+unset($_links['wishlist']);
+unset($_links['OAuth Customer Tokens']); /* My Applications */
+unset($_links['downloadable_products']); /* My Downloadable Products */
+unset($_links['aw_storecredit']);
+
+unset($_links['invitations']); /* My Invitations */
+unset($_links['enterprise_customerbalance']); /* Store Credit */
+unset($_links['enterprise_reward']); /* Reward Points */
+unset($_links['giftregistry']); /* Gift Registry */
+unset($_links['enterprise_giftcardaccount']); /* Gift Card Link */    
 
 ?>
 
