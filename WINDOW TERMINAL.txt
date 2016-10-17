@@ -1,0 +1,19 @@
+
+cd to another disk: D:
+
+Các lệnh tương ứng trên LINUX:
+cp => copy		
+cp -R => xcopy // copy a directory tree
+chown / chmod => attrib	
+clear => cls
+ls => dir
+ln => assign	// Create a file link
+mv => move
+rm	=> del	
+rm -r => deltree	
+rm -r => rmdir /s	
+vi => edit
+
+
+
+

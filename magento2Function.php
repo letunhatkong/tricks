@@ -3,6 +3,7 @@ sudo php bin/magento indexer:reindex
 
 <!-- Re-DEPLOY -->
 sudo php bin/magento setup:static-content:deploy
+sudo chmod -R 777 var/ pub/
 M2 có 2 chế độ symlink and copy. deploy content => copy.
 Nếu M2 ko tự động tạo symlink khi F5 page thì có nghĩa là cần xem lại file .htaccess của thư mục pub/static
 Del pub/static/* && var/view_preprocessed
@@ -240,7 +241,7 @@ http://blog.belvg.com/newsletters-in-magento-2-0.html
 Flat Rate: Set Highest shippping price for international.
 Marketing -> Promotions -> Cart Price Rules: Set discount by countries 
 
-Install MAGENTO 2
+<!-- Install MAGENTO 2 -->
 Link step by step: http://devdocs.magento.com/guides/v2.0/install-gde/bk-install-guide.html
 
 1/ Install apache2, mySQL, PHP
@@ -260,9 +261,6 @@ sudo add-apt-repository ppa:ondrej/php5-5.6
 sudo apt-get -y update
 sudo apt-get -y install php5 php5-common php5-mcrypt php5-curl php5-cli php5-mysql php5-gd php5-intl php5-xsl libapache2-mod-php5 libcurl3 php5-imagick zip
 sudo apt-get install mysql-server-5.6 php5-mysql
-
-INSTALL imagemagick
-sudo apt-get install php5-imagick zip
 
 curl --version (>= 7.34)
 
@@ -314,7 +312,8 @@ sudo service apache2 restart
 
 5/ Create DATABASE
 mysql -u root -p
-CREATE DATABASE wrm2; CREATE USER wrm2@localhost IDENTIFIED BY 'Password$1'; GRANT ALL PRIVILEGES ON wrm2.* TO wrm2@localhost IDENTIFIED BY 'Password$1'; FLUSH PRIVILEGES; 
+CREATE DATABASE hlm1 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci; CREATE USER hlm1@localhost IDENTIFIED BY 'Password$1'; GRANT ALL PRIVILEGES ON hlm1.* TO hlm1@localhost IDENTIFIED BY 'Password$1'; FLUSH PRIVILEGES; 
+
 
 6/ Autoload error - Vendor autoload is not found. Please run 'composer install' under application root directory.
 sudo apt-get update
@@ -355,10 +354,10 @@ sudo find . -type d -exec chmod 777 {} \; && sudo find . -type f -exec chmod 664
 
 8/ Go to http://localhost/project-name/setup/
 
-===== UPDATE URL BASE ====
+<!-- ===== UPDATE URL BASE ==== -->
 UPDATE core_config_data SET value = 'http://54.213.49.253/' WHERE config_id = 2; 
 
-===== BUG MAGENTO ======
+<!-- ===== BUG MAGENTO ====== -->
 Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock'
 
 Solution:
@@ -370,7 +369,7 @@ sudo /etc/init.d/apache2 restart
 sudo /etd/init.d/apparmor.d reload
 sudo service mysql start 
 
-===== BUG MAGENTO ======
+<!-- ===== BUG MAGENTO ====== -->
 [Exception] Missing write permissions to the following directories: pub/static folder - MAGENTO 2
 
 How to debug and fix:
@@ -381,6 +380,12 @@ How to debug and fix:
 
 Now you'll see what is really wrong, and you can fix it. Personally i remove everything in pub/static, this will be auto generated content so you should not be worried about that.
 
+<!-- BUG:  Use of undefined constant MCRYPT_BLOWFISH - assumed 'MCRYPT_BLOWFISH' -->
+Bug này có thể là do mcrypt chưa được cài đặt trên php5 hoặc php7
+Check if mcrypt module is there: php -m | grep mcrypt 
+If not then install mcrypt: sudo apt-get install php7.0-mcrypt
+Then enable the module: phpenmod mcrypt
+Restart apache2
 
 <!-- Override Minicart M2 -->
 Edit Your_theme/Magento_Checkout/web/template/minicart/content.html

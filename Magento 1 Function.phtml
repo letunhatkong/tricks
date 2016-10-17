@@ -7,6 +7,39 @@ echo $this->getLayout()->createBlock('newsletter/subscribe')->setTemplate('newsl
 {{block type="core/template" name="homePageBlock" template="page/html/home.phtml"}}
 
 
+<!-- Link in CMS Page, CMS Block -->
+{{store url="module/controller/action"}}
+To get SKIN URL
+{{skin url='images/sampleimage.jpg'}}
+To get Media URL
+{{media url='/sampleimage.jpg'}}
+To get Store URL
+{{store url='mypage.html'}}
+To get Base URL
+{{base url=''}}
+TO Retrieve URL path in PHTML
+Not secure Skin URL
+<?php echo $this->getSkinUrl('images/sampleimage.jpg') ?>
+Secure Skin URL
+<?php echo $this->getSkinUrl('images/ sampleimage.gif',array('_secure'=>true)) ?>
+Get  Current URL
+<?php $current_url = Mage::helper('core/url')->getCurrentUrl();?>
+Get Home URL
+<?php $home_url = Mage::helper('core/url')->getHomeUrl();?>
+Get Magento Media Url
+<?php Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);?>
+<?php Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA);?>
+Get Magento Skin Url
+<?php Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);?>
+Get Magento Js Url
+<?php Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS);?>
+Get Magento Store Url
+<?php 
+$baseUrl = Mage::getBaseUrl();
+Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);?>
+
+
+
 <?php
 /**
  * Create custom attribute in magento
@@ -88,6 +121,20 @@ $_product= Mage::getSingleton('catalog/product')->load($_item->getProductId());
 echo $_product->getResource()->getAttribute('attributeCode')->getFrontend()->getValue($_product);
 $product->getData("attributeCode");
 $product->getAttributeText("attributeCode");
+
+// Load the required attribute
+$attributeCode = "your_attribute_code";
+$attributeId = Mage::getResourceModel('eav/entity_attribute_collection')->setCodeFilter($attributeCode)->getFirstItem()->getAttributeId();
+$attribute = Mage::getModel('catalog/resource_eav_attribute')->load($attributeId);
+
+// Get the Admin Store View (default) attribute options
+$attributeOptions = Mage::getResourceModel('eav/entity_attribute_option_collection')
+    ->setAttributeFilter($attributeId)
+    ->setStoreFilter(0)
+    ->setPositionOrder()
+    ->load()
+    ->toOptionArray();
+
 // # Get Custom Attribute in Magento
 
 // Get Order ID Magento
@@ -166,6 +213,10 @@ unset($_links['enterprise_giftcardaccount']); /* Gift Card Link */
 
 ?>
 
+<!-- Error Processing Request: “Invalid website id requested.” -->
+select core_website and look for website_id attribute.
+delete all lines in core_store and core_store_group tables has website_id attribute deference to core_website.website_id.
+
 <!--Permission file and folder in Magento-->
 sudo find /var/www/html/magentoInstallationFolder/ -type d -exec chmod 775 {} \;
 sudo find /var/www/html/magentoInstallationFolder/ -type f -exec chmod 664 {} \;
@@ -205,22 +256,37 @@ RewriteCond %{REQUEST_FILENAME} !-l
 RewriteRule . index.php [L]
 
 
-<!--INSTALL MAGENTO IN LINUX-->
+<!--INSTALL MAGENTO 1 IN LINUX-->
 Read more:
 https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-magento-on-ubuntu-14-04
 
+1/ INSTALL EVR
 sudo apt-get update
 sudo apt-get install apache2
 
-sudo apt-get install mysql-server php5-mysql
-sudo mysql_install_db
-sudo mysql_secure_installation
 
-sudo apt-get install php5 libapache2-mod-php5 php5-mcrypt libcurl3 php5-curl php5-gd
+INSTALL PHP 5.6.x
+sudo apt-get -y update
+sudo add-apt-repository ppa:ondrej/php5-5.6
+sudo apt-get -y update
+sudo apt-get -y install php5 php5-common php5-mcrypt php5-curl php5-cli php5-mysql php5-gd php5-intl php5-xsl libapache2-mod-php5 libcurl3 php5-imagick zip
+sudo apt-get install mysql-server-5.6 php5-mysql
 
 sudo nano /etc/apache2/mods-enabled/dir.conf
 Change line: DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
 
+
+2/ Config PHP.ini
+Ubuntu: /etc/php5/cli/php.ini and /etc/php5/apache2/php.ini
+/etc/php/7.0/cli/php.ini and /etc/php/7.0/apache2/php.ini
+
+memory_limit = 768M or 1G
+post_max_size 100M
+always_populate_raw_post_data = -1 (removed on php7)
+upload_max_filesize 100M
+
+
+3/ Config VHost
 sudo nano /etc/apache2/sites-available/wrm1.conf
 
 <VirtualHost wrm1.vn:80>
@@ -240,19 +306,19 @@ sudo nano /etc/apache2/sites-available/wrm1.conf
 
 </VirtualHost>
 
-
-
 sudo a2ensite wrm1.conf
 sudo a2dissite 000-default.conf
 
 sudo a2enmod rewrite
 sudo php5enmod mcrypt
 
-mysql -u root -p
-CREATE DATABASE wrm1; CREATE USER wrm1@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON wrm1.* TO wrm1@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
-exit
 
-Copy magento folder to this path /var/www/html/
+4/ Create DATABASE
+mysql -u root -p
+CREATE DATABASE magento DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci; CREATE USER magento@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON magento.* TO magento@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES; 
+
+
+5/ Copy magento folder to this path /var/www/html/
 
 Permission folder
 sudo find /var/www/html/magentoInstallationFolder/ -type d -exec chmod 775 {} \;
@@ -260,8 +326,6 @@ sudo find /var/www/html/magentoInstallationFolder/ -type f -exec chmod 664 {} \;
 
 sudo find -type d -exec chmod 775 {} \; &&  sudo find -type f -exec chmod 664 {} \; && sudo chmod -R 777 var/  media/ app/etc/ downloader/;
 
-Set Writable for 3 folders in root magento: var, media, app/etc
-sudo chmod -R 777 var/  media/ app/etc/ downloader/
 
 
 
