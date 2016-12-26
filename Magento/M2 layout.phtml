@@ -1,0 +1,106 @@
+
+
+
+<!-- Override theme layout xml -->
+{Magento2_root}app/design/frontend/<theme>/Magento_Checkout/layout/override/theme/Magento/blank/checkout_index_index.xml
+
+
+<!-- Add custom link to top link -->
+<referenceBlock name="top.links">
+    <block class="Magento\Framework\View\Element\Html\Link" name="faq-link">
+        <arguments>
+            <argument name="label" xsi:type="string" translate="true">FAQs</argument>
+            <argument name="path" xsi:type="string" translate="true">faq</argument>
+        </arguments>
+    </block>
+</referenceBlock>
+
+<!-- Change default direction in category page - Update Magento_Catalog/layout/catalog_category_view.xml -->
+<referenceContainer name="content">
+    <referenceBlock class="Magento\Catalog\Block\Product\ListProduct" name="category.products.list" as="product_list">
+        <action method="setDefaultDirection">
+            <argument name="dir" xsi:type="string">desc</argument>
+        </action>
+    </referenceBlock>
+</referenceContainer>
+
+
+
+<!-- Layout -->
+<!-- Banner home -->
+<block class="Magento\Framework\View\Element\Template" name="top.slider.home" template="Magento_Theme::html/top-slider-home.phtml"/>
+<!--   <move element="top.slider.home" before="main.content" destination="page.wrapper"/> -->
+<!-- Call Home Block: {{block class="Magento\Framework\View\Element\Template" name="home_static" template="Magento_Theme::html/home.phtml"}} -->
+<!-- # Banner home -->
+
+<!-- Remove footer -->
+<referenceContainer name="footer" remove="true" />
+<!-- Move Copyright -->
+<move element="copyright" destination="before.body.end" />
+<!-- Remove WishList, Register in top link -->
+<referenceBlock name="wish-list-link" remove="true" />
+<referenceBlock name="register-link" remove="true" />
+<!-- Move minicart -->
+<move element="minicart" destination="top.links" after="-"/>
+<!-- Add custom link to top.link -->
+<referenceBlock name="top.links">
+    <block class="Magento\Framework\View\Element\Html\Link\Current" name="about-us">
+        <arguments>
+            <argument name="label" xsi:type="string">About Us</argument>
+            <argument name="path" xsi:type="string">about-us</argument>
+        </arguments>
+    </block>
+</referenceBlock>
+<!-- Move Breadcrumb -->
+    <move element="breadcrumbs" destination="content" before="-"/>
+<!-- JS -->
+<block class="Magento\Framework\View\Element\Text" name="carousel">
+    <arguments>
+        <argument name="text" xsi:type="string"><![CDATA[<script type="text/javascript" src="/pub/js/carousel.js"></script>]]></argument>
+    </arguments>
+</block>
+<move element="carousel" destination="before.body.end"/>
+
+<!-- # Layout -->
+
+<!-- Remove unwanted account navigation links -->
+<referenceBlock name="customer-account-navigation-downloadable-products-link" remove="true"/>
+<!-- subscription link -->
+<referenceBlock name="customer-account-navigation-newsletter-subscriptions-link" remove="true"/>
+<!-- billing agreement link -->
+<referenceBlock name="customer-account-navigation-billing-agreements-link" remove="true"/>
+<!-- product review link -->
+<referenceBlock name="customer-account-navigation-product-reviews-link" remove="true"/>
+<!-- my credit card link -->
+<referenceBlock name="customer-account-navigation-my-credit-cards" remove="true"/>
+<!-- account link -->
+<referenceBlock name="customer-account-navigation-account-link" remove="true"/>
+<!-- account edit link -->
+<referenceBlock name="customer-account-navigation-account-edit-link" remove="true"/>
+<!-- address link -->
+<referenceBlock name="customer-account-navigation-address-link" remove="true"/>
+<!-- orders link -->
+<referenceBlock name="customer-account-navigation-orders-link" remove="true"/>
+<!-- wish list link -->
+<referenceBlock name="customer-account-navigation-wish-list-link" remove="true"/>
+
+<!-- Remove links on Top Links - following code -->
+<referenceBlock name="register-link" remove="true" />           <!--for Create Account Link-->
+<referenceBlock name="authorization-link" remove="true" />      <!--for Sign In Link  -->
+<referenceBlock name="wish-list-link" remove="true" />          <!--for WishList Link-->
+<referenceBlock name="my-account-link" remove="true" />         <!--for My Account Link-->
+
+<!-- Remove action add to wishlist in cart page - Magento_Wishlist/layout/checkout_cart_item_renderers.xml -->
+<referenceBlock name="checkout.cart.item.renderers.default.actions.move_to_wishlist" remove="true" />
+<referenceBlock name="checkout.cart.item.renderers.simple.actions.move_to_wishlist" remove="true" />
+<referenceBlock name="checkout.cart.item.renderers.bundle.actions.move_to_wishlist" remove="true" />
+<referenceBlock name="checkout.cart.item.renderers.downloadable.actions.move_to_wishlist" remove="true" />
+<referenceBlock name="checkout.cart.item.renderers.grouped.actions.move_to_wishlist" remove="true" />
+<referenceBlock name="checkout.cart.item.renderers.configurable.actions.move_to_wishlist" remove="true" />
+<referenceBlock name="checkout.cart.item.renderers.virtual.actions.move_to_wishlist" remove="true" />
+
+<!-- Render child block -->
+<block name="parent">
+    <block name="child"></block>
+</block>
+Trong file phtml cua parent ta co the goi: $block->getLayout()->renderElement('child');

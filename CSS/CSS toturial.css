@@ -16,6 +16,7 @@ a[href*="w3schools"]    Selects every <a> element whose href attribute value con
 p::first-letter Selects the first letter of every <p> element   1
 p::first-line   Selects the first line of every <p> element
 :not(p) Selects every element that is not a <p> element
+:not(:first-child)
 
 Các đơn vị tương đối được sử dụng trong CSS gồm có:
 px: đơn vị tuyệt đối (tương đương 1 điểm ảnh).
@@ -24,6 +25,38 @@ pt: đơn vị tuyệt đối (1 inch = 72pt)
 em: Là đơn vị tham chiếu tỷ lệ so với phần tử mẹ của nó dựa vào giá trị của thuộc tính font-size. Ví dụ bạn đặt cho font-size cho phần tử mẹ của nó là 19px thì nếu bạn sử dụng em trong khu vực phần tử đó thì 1em = 19px.
 rem: Là đơn vị tham chiếu tỷ lệ so với phần tử gốc của một website dựa vào thuộc tính font-size của thẻ <html>, nghĩa là sẽ biến đổi tùy theo giá trị của thuộc tính font-size trong thẻ <html>. Cũng như rem, nếu bạn khai báo font-size cho thẻ <html> là 16px thì 1rem = 16px. 
 
+
+/* Mansory */
+.mansory {
+    -moz-column-count: 4;
+    -webkit-column-count: 4;
+    column-count: 4;
+}
+.mansory .item {
+    display: inline-block;         
+    margin: 0 0 15px;
+    width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;       
+}
+.mansory .item img {
+    width: 100%;
+}
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .mansory {
+        -moz-column-count: 3;
+        -webkit-column-count: 3;
+        column-count: 3;
+    }
+}
+@media only screen and (max-width: 767px) {
+    .mansory {
+        -moz-column-count: 2;
+        -webkit-column-count: 2;
+        column-count: 2;
+    }
+}
 
 /*Create triangle*/
 .triangle {
@@ -34,6 +67,30 @@ rem: Là đơn vị tham chiếu tỷ lệ so với phần tử gốc của mộ
     border-left: 7px solid;
     border-top: 5px solid transparent;
     border-bottom: 5px solid transparent;
+}
+
+/* Arrow */
+#thumbs2-prev::before, #thumbs2-next::before {
+    position: absolute;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-left: -10px;
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+}
+#thumbs2-prev::before {
+    top: 5px;
+    -ms-transform:rotate(-45deg);/*IE9*/
+    -webkit-transform:rotate-45deg);
+    transform: rotate(-45deg);
+}
+#thumbs2-next::before {
+    bottom: 5px;
+    -ms-transform:rotate(135deg);/*IE9*/
+    -webkit-transform:rotate(135deg);
+    transform: rotate(135deg);
 }
 
 /* Controller < > CSS */
@@ -73,31 +130,50 @@ ul li div img {
     transform: scaleY(-1);
 }
 
-/*Fix bug: Changed size font in horizontal iphone (iphone ngang)*/
+/*Fix bug: Change font size in horizontal iphone (iphone ngang)*/
 .aui {
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
 }
 
+/* Same height - item row */
+.flex-row {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+    .flex-row > [class*='col-'] {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+    }
+        .flex-row .inner {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-flex: 1;
+            -webkit-flex: 1 0 auto;
+            -ms-flex: 1 0 auto;
+            flex: 1 0 auto;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -ms-flex-direction: column;
+            flex-direction: column;
+        }
+
 /*Vertical Centering With CSS*/
-/*(know Width, know Height)*/
-div.parent {
-    width: 40%;
-    padding-bottom: 25.05%;
-/ / Ratio position: relative;
-}
-
-div.parent .centerDiv {
-    width: 315px;
-    height: 170px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto;
-}
-
 /*
 <div class="outter">
     <div class="miđle">
@@ -111,17 +187,15 @@ div.parent .centerDiv {
     height: 100%;
     width: 100%
 }
-
-.middleDIV {
-    display: table-cell;
-    vertical-align: middle
-}
-
-.innerDiv {
-    margin-left: auto;
-    margin-right: auto;
-    width: 100px;
-}
+    .middleDIV {
+        display: table-cell;
+        vertical-align: middle
+    }
+        .innerDiv {
+            margin-left: auto;
+            margin-right: auto;
+            width: 100px;
+        }
 
 /*Other way*/
 .parent-element {
@@ -129,12 +203,11 @@ div.parent .centerDiv {
     -moz-transform-style: preserve-3d;
     transform-style: preserve-3d;
 }
-
-.element {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-}
+    .element {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
 
 /*Other way: (know Width, unknow Height)*/
 .parent-center {
@@ -142,25 +215,23 @@ div.parent .centerDiv {
     display: table;
     text-align: center;
 }
-
-.parent-center .mid-content {
-    text-align: center;
-    display: table-cell;
-    vertical-align: middle;
-}
+    .parent-center .mid-content {
+        text-align: center;
+        display: table-cell;
+        vertical-align: middle;
+    }
 
 /*Other way (unknow width, unknow height)*/
 .parent {
     position: relative;
 }
-
-.child {
-    /*width: 80%;*/
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
+    .child {
+        /*width: 80%;*/
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 
 
 /* Short Text CSS */
@@ -231,4 +302,8 @@ div {
     -moz-transition: all 300ms ease-in-out;
     -webkit-transition: all 300ms ease-in-out;
     -o-transition: all 300ms ease-in-out;
+}
+
+.syntax-background {
+    background: bg-color bg-image position/bg-size bg-repeat bg-origin bg-clip bg-attachment initial|inherit;
 }

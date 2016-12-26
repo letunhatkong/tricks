@@ -1,0 +1,61 @@
+
+
+<!-- Bug: Trying to override modular view files for theme 'Magento/blank' which is not ancestor of theme ... -->
+Show table 'theme' in database; Check parent id of your theme
+
+<!-- ===== BUG MAGENTO ====== -->
+Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock'
+
+Solution:
+sudo service mysql stop
+sudo /etc/init.d/apparmor reload
+sudo service mysql start 
+
+sudo /etc/init.d/apache2 restart
+sudo /etd/init.d/apparmor.d reload
+sudo service mysql start 
+
+<!-- Minicart not show after login -->
+Enable cache
+
+<!-- But page not load "rjsResolver": "mage/requirejs/resolver" -->
+Only clear browser cache 
+
+<!-- Bug không hiển thị top menu khi config move trong xml -->
+Disable cache trong 'Page Cache - Full page caching' thì menu hiện ra.
+Còn bật cache all lên thì nó lại mất.
+Chỉ trang home bị, các trang khác không bị.
+
+
+
+<!-- Bug Magento 2.0.9 - Products per Page on List doesn't work  -->
+In file vendor/magento/module-catalog/Helper/Product/ProductList.php
+Change line 21 (change 'view' to 'list')
+const VIEW_MODE_LIST = 'list'; // old value is 'view'
+
+
+<!-- ===== BUG MAGENTO ====== -->
+[Exception] Missing write permissions to the following directories: pub/static folder - MAGENTO 2
+
+How to debug and fix:
+1) setup/src/Magento/Setup/Model/FilePermissions.php
+2) Goto line 143 in method checkRecursiveDirectories
+3) Add the lines var_dump($subDirectory);var_dump($subDirectory->isWritable()); return false;
+4) Re run bin/magento setup:upgrade
+
+Now you'll see what is really wrong, and you can fix it. Personally i remove everything in pub/static, this will be auto generated content so you should not be worried about that.
+
+<!-- Bug InvalidArgumentException There are no commands defined in the "indexer" namespace. -->
+Re-up base magento code to current source
+
+<!-- BUG:  Use of undefined constant MCRYPT_BLOWFISH - assumed 'MCRYPT_BLOWFISH' -->
+Bug này có thể là do mcrypt chưa được cài đặt trên php5 hoặc php7
+Check if mcrypt module is there: php -m | grep mcrypt 
+If not then install mcrypt: sudo apt-get install php7.0-mcrypt
+Then enable the module: phpenmod mcrypt
+Restart apache2
+
+<!-- Bug unable to load theme -->
+sudo php bin/magento deploy:mode:show
+sudo php bin/magento deploy:mode:set developer
+Server phai bat developer mode

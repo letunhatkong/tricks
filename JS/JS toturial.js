@@ -20,6 +20,10 @@ $(location).attr('href');           //   http://www.test.com:8082/index.php#tab2
 $(location).attr('hash');          //    #tab2
 $(location).attr('search');        //    ?foo=123
 
+// similar behavior as an HTTP redirect
+window.location.replace("http://stackoverflow.com");
+// similar behavior as clicking on a link
+window.location.href = "http://stackoverflow.com";
 
 // Toggle css menu
 $('.itemMenuFt .titFt').click(function(){
@@ -31,6 +35,13 @@ $('.itemMenuFt .titFt').click(function(){
         $(this).removeClass("open");
     }
 });
+if (selectCt.is(':visible')) {
+    $(this).text("+");
+    selectCt.slideUp('normal');
+} else {
+    $(this).text("-");
+    selectCt.slideDown('normal');
+}
 
 
 // Click outside to hidden menu
@@ -40,3 +51,15 @@ $('html').click(function() {
 $('#menucontainer').click(function(event){
     event.stopPropagation();
 });
+
+
+// Lam tron so
+var iNum = 5.123456;
+iNum.toPrecision(5);   // Returns 5.1235
+iNum.toPrecision(2);   // Returns 5.1
+iNum.toPrecision(1);   // Returns 5
+
+Number(Math.round(1.005+'e2')+'e-2'); // 1.01
+Number(Math.round(1.005 * 100) / 100); // 1.01 - 2 chu so thi tuong ung voi 100
+
+

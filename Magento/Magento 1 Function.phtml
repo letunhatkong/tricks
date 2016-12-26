@@ -39,6 +39,21 @@ $baseUrl = Mage::getBaseUrl();
 Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);?>
 
 
+<!-- Update email for guest order -->
+$order = Mage::getModel('sales/order')->load($order_id);
+$order->setCustomerEmail($email_address)->save();
+
+
+<!-- "Suspected Fraud" Order with PAYPAL -->
+Lí do: hầu hết là do rates hoặc tax rounding. Số tiền mà Paypal đã tính toán cho khách hàng khác với số tiền mà Magento nghĩ là sẽ được thanh toán.
+Paypal bảo Magento là số tiền đã được thanh toán và Magento thấy số tiền khác với hệ thống của mình nên nghi ngờ là có gian lận.
+
+Hậu quả: Hóa đơn bị nghi ngờ gian lận, nên hóa đơn ko thể xuất được. Khách hàng sẽ không được nhận email thông báo. Và hóa đơn kết thúc một cách lấp lửng. Vì bạn ko thể xuất hóa đơn bằng tay.
+
+Cách khắc phục:
+
+Step 1: Đầu tiên unassign order. Sau đó nếu muốn thì có thể assign lại nó bằng cách nhấn vào nút assign.
+Bây giờ bạn có thể cập nhật trạng thái của lệnh được xử lý, và bạn cũng sẽ có thể xuất hóa đơn theo thứ tự bằng tay. 
 
 <?php
 /**
