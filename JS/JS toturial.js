@@ -63,3 +63,8 @@ Number(Math.round(1.005+'e2')+'e-2'); // 1.01
 Number(Math.round(1.005 * 100) / 100); // 1.01 - 2 chu so thi tuong ung voi 100
 
 
+// Convert Object to Array
+array = $.map(dataObj, function (value, index) {
+    value.key = index;
+    return [value];
+});

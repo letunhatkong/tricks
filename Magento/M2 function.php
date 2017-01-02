@@ -5,6 +5,15 @@
 
 <!-- ======= CATALOG - PRODUCT DETAIL PAGE - CATEGORIES PAGE ======= -->
 
+<!-- Remove Please select in option select -->
+/Magento/Catalog/Block/Product/View/Options/Type/Select.php
+<?php
+if ($_option->getType() == \Magento\Catalog\Model\Product\Option::OPTION_TYPE_DROP_DOWN) {
+    $select->setName('options[' . $_option->getid() . ']');
+    //->addOption('', __('-- Please Select --'));
+} 
+?>
+
 <!-- Enable Review -->
 \vendor\magento\module-review\Block\Product\ReviewRenderer.php 
 \vendor\magento\module-review\Block\View.php
