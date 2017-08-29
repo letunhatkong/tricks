@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>test</title>
+	<link rel="stylesheet" type="text/css" href="magnifier.css">
+	<script type="text/javascript" src="Event.js"></script>
+	<script type="text/javascript" src="Magnifier.js"></script>
+</head>
+
+
+<body>
+
+<div style="width: 1200px; margin: 0 auto">
+
+	<div style="width: 49%; float: left; position: relative;">
+		<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/112_Downy_Woodpecker.jpg/250px-112_Downy_Woodpecker.jpg" 
+		data-large-img-url="http://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/112_Downy_Woodpecker.jpg/1000px-112_Downy_Woodpecker.jpg" id="thumb" 
+		data-large-img-wrapper="gallery-preview" class="kong" />
+		<br>
+		<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/110_Hooded_Warbler.jpg/250px-110_Hooded_Warbler.jpg" 
+		data-large-img-url="http://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/110_Hooded_Warbler.jpg/1000px-110_Hooded_Warbler.jpg" id="thumb2" 
+		data-large-img-wrapper="gallery-preview" class="kong" />
+
+
+	</div>
+
+	
+	<div style="width: 49%; height: 500px; float: right; position: relative; overflow: hidden;" id="gallery-preview" >
+		<div class="heading">Birds of America</div>
+		<div class="title" id="gallery-preview-title">&nbsp;</div>
+		<div class="author">by John James Audubon</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	
+	var evt = new Event(),
+    m = new Magnifier(evt, {
+        largeWrapper: document.getElementById('gallery-preview')
+    });
+
+    m.attach({
+	    thumb: '.kong',
+	    zoomable: false,
+	    largeWrapper: 'gallery-preview'
+	});
+</script>
+
+</body>
+</html>

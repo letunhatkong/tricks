@@ -1,0 +1,10 @@
+/* http://www.jacklmoore.com/notes/rounding-in-javascript/ */
+function round(value, decimals) {
+    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+}
+
+/* http://stackoverflow.com/a/11832950 */
+Math.round(num * 100) / 100;
+
+/* http://stackoverflow.com/a/12830454 */
+parseFloat("123.456").toFixed(2);

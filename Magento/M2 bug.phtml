@@ -1,11 +1,100 @@
+<!-- Uncheck My billing and shipping address are the same - checkout page -->
+<?php 
+    /**
+    * In vendor/magento/module-checkout/view/frontend/web/js/model/checkout-data-resolver.js
+    */
+    applyBillingAddress: function () {
+        ...
+        //if (shippingAddress &&
+        //    shippingAddress.canUseForBilling() &&
+        //    (shippingAddress.isDefaultShipping() || !quote.isVirtual())
+        //) {
+        //    //set billing address same as shipping by default if it is not empty
+        //    selectBillingAddress(quote.shippingAddress());
+        //}
+    }
+
+    /**
+    * In /vendor/magento/module-checkout/view/frontend/web/js/model/shipping-save-processor/default.js
+    */
+    saveShippingInformation: function () {
+        ...
+        //if (!quote.billingAddress()) {
+        //    selectBillingAddressAction(quote.shippingAddress());
+        //}
+        ...
+    }
+?>
+
+
+
+<!-- 500 internal server error -->
+try re-deploy
+check permission file and folder: 775 folder, 664 file
+check rewrite apache2 mode
+re-up .htaccess from base M2
+
+
+<!-- Bug: break UI when create order from customer in admin -->
+Reason: Missing quote_address of customer 
+
+<!-- Bug Area code not set: Area code must be set before starting a session -->
+<?php 
+// in /vendor/magento/framework/Session/SessionManager.php
+public function __construct(
+    // Samuel Kong
+    try {
+        $this->appState->setAreaCode("frontend");
+    } catch (\Magento\Framework\Exception\LocalizedException $e) {
+        // intentionally left empty
+    }
+    // # Samuel Kong
+    // Enable session.use_only_cookies
+    ini_set('session.use_only_cookies', '1');
+    $this->start();
+?>
+
+<!-- Change URL in M2.1 -->
+Table core_config_data
+web/secure/base_url
+web/unsecure/base_url
+web/secure/base_link_url    
+web/unsecure/base_link_url
+
+select * from core_config_data where path = 'web/secure/base_url' or path = 'web/unsecure/base_url' or path = 'web/secure/base_link_url' or path = 'web/unsecure/base_link_url'
+
+<!-- Area code not set: Area code must be set before starting a session. -->
+[Magento\Framework\Exception\SessionException] + [Magento\Framework\Exception\LocalizedException]
+Go to table setup_module in DB. Check data_version = schema_version at all row.
+Re-upgrade and static-content:deploy.
+
+
+<!-- Bug Delete operation is forbidden for current area - Register Customer M2.1 -->
+https://github.com/magento/magento2/issues/5699
+Lỗi này xảy ra do form register bị lỗi ở các field của Address, khiến việc xóa user bị lỗi
+
+Có lỗi khi xử lý tại các file sau
+Customer/Controller/Account/CreatePost.php
+<?php $customer = $this->accountManagement->createAccount($customer, $password, $redirectUrl); ?>
+
+Trong file module-customer/Model/AccountManagement.php comment dòng $this->customerRepository->delete($customer); để xem nó sẽ báo những lỗi gì nữa.
+<?php 
+public function createAccountWithPasswordHash(...)
+...
+catch (InputException $e) {
+    // $this->customerRepository->delete($customer);
+    throw $e;
+} 
+?>
+Nếu như Form register có các biến của Address thì cần phải code thêm dòng này trong file register
+<?php $block->setShowAddressFields(true); ?>
+<!-- ============================= -->
 
 
 <!-- Bug: Trying to override modular view files for theme 'Magento/blank' which is not ancestor of theme ... -->
 Show table 'theme' in database; Check parent id of your theme
 
-<!-- ===== BUG MAGENTO ====== -->
-Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock'
-
+<!-- Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' -->
 Solution:
 sudo service mysql stop
 sudo /etc/init.d/apparmor reload
@@ -15,17 +104,61 @@ sudo /etc/init.d/apache2 restart
 sudo /etd/init.d/apparmor.d reload
 sudo service mysql start 
 
+<!-- [Exception] Warning: ltrim() expects parameter 1 to be string, object given in /var/www/html/../vendor/magento/framework/Code/Generator/EntityAbstract.php on line 152 -->
+sudo rm -rf var/di; sudo php bin/magento setup:upgrade;
+
+<!-- Add footer header in checkout page -->
+M2.0.x : Do trong theme blank mặc định đã gọi remove header, minicart rồi.
+Ta copy file trong vendor/theme-blank/../checkout_index_index.xml vào myTheme/Magento_Checkout/layout/override/theme/blank/checkout_index_index.xml
+<referenceBlock name="minicart" remove="false"/>
+<referenceContainer name="header.panel" remove="false"/>
+<referenceBlock name="top.search" remove="false"/>
+<referenceBlock name="catalog.compare.link" remove="true"/>
+<referenceBlock name="catalog.topnav" remove="false"/>
+<referenceContainer name="footer-container" remove="true"/>
+
+M2.1: Trong theme blank sẽ ko có file checkout_index_index.xml. Nhưng mặc định file checkout_index_index.xml trong vendor/module-checkout đang kế thừa layout="checkout" (page_layout/checkout.xml). Layout checkout.xml thì lại không khai báo các thành phần của header.
+
+Cách 1: ta coppy file vendor/module-checkout/layout/checkout_index_index.xml vào yourTheme/Magento_Checkout/layout/override/base/
+Sửa lại thành layout="1column" và xóa dòng <move element="logo" destination="checkout.header.wrapper"/> 
+
+Cách 2 (nên dùng): ta sẽ copy nội dung của 1column.xml vào yourTheme/Magento_Checkout/page_layout/checkout.xml
+Tạo file yourTheme/Magento_Checkout/layout/checkout_index_index.xml
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <move element="logo" destination="header-wrapper" before="-"/>
+    </body>
+</page>
+
+<!-- 404 error: Page not found. in admin page afrer install M2.1.4 -->
+Enmode rewrite, re deploy static, permission files. Check exists .htaccess file in root ?
+
+<!-- Bug: page-cache.js:40 Uncaught TypeError: element.prop is not a function -->
+Edit vendor/Magento/PageCache/view/frontend/web/js/page-cache.js #Line 40
+Replace the problem line with the new one: .prop('href', element.src)
+
 <!-- Minicart not show after login -->
 Enable cache
 
+<!-- M2.1 "Invalid Form Key" when saving configurable product with multiple configurations -->
+The solution is to increase max_input_vars in php.ini file. not a Magento 2 issue.
+use php_value[max_input_vars] = 10000
+instead of max_input_vars
+
 <!-- But page not load "rjsResolver": "mage/requirejs/resolver" -->
 Only clear browser cache 
+
+<!-- There are no commands defined in the "setup:static-content" namespace. -->
+sudo rm -rf var/di/; sudo php bin/magento setup:di:compile; 
 
 <!-- Bug không hiển thị top menu khi config move trong xml -->
 Disable cache trong 'Page Cache - Full page caching' thì menu hiện ra.
 Còn bật cache all lên thì nó lại mất.
 Chỉ trang home bị, các trang khác không bị.
 
+<!-- Uncaught TypeError: Unable to process binding "attr: function (){return {'data-config-scope':$data.scopeLabel} }" -->
+Remove all short description of all product. Using update all function at list product page in admin page
 
 
 <!-- Bug Magento 2.0.9 - Products per Page on List doesn't work  -->
@@ -59,3 +192,109 @@ Restart apache2
 sudo php bin/magento deploy:mode:show
 sudo php bin/magento deploy:mode:set developer
 Server phai bat developer mode
+
+
+<!-- Option Id of Product changed when update product -->
+<?php 
+// Update for M2.1.5
+// https://github.com/Hevelop/magento2-patches/blob/master/Patch-Magento_Catalog-M2.1.5-MAGETWO-56410-MAGETWO-56411-github-issues-5931-5612.patch
+
+// https://github.com/magento/magento2/commit/430d2ae6d8bde096160c45a6bfe3c2958774b500
+// https://github.com/magento/magento2/commit/e2dc5d8b721600344697ed6cce87528c56cc4a1a
+
+app/code/Magento/Catalog/Controller/Adminhtml/Product/Initialization/Helper.php
+public function initializeFromData(\Magento\Catalog\Model\Product $product, arra
+         }
+         $customOption = $this->getCustomOptionFactory()->create(['data' => $customOptionData]);
+         $customOption->setProductSku($product->getSku());
+-                    $customOption->setOptionId(null);
+         $customOptions[] = $customOption;
+     }
+ }
+
+protected function setProductLinks(\Magento\Catalog\Model\Product $product)
+ 
+foreach ($linkTypes as $linkType => $readonly) {
+    if (isset($links[$linkType]) && !$readonly) {
+-       foreach ((array) $links[$linkType] as $linkData) {
++       foreach ((array)$links[$linkType] as $linkData) {
+            if (empty($linkData['id'])) {
+                continue;
+            }
+            
+app/code/Magento/Catalog/Model/Product/Option/Repository.php
+ @@ -140,7 +140,20 @@ public function save(\Magento\Catalog\Api\Data\ProductCustomOptionInterface $opt
+         $product = $this->productRepository->get($productSku);
+         $metadata = $this->getMetadataPool()->getMetadata(ProductInterface::class);
+         $option->setData('product_id', $product->getData($metadata->getLinkField()));
+-        $option->setOptionId(null);
++        $option->setData('store_id', $product->getStoreId());
++
++        if ($option->getOptionId()) {
++            $persistedOption = $product->getOptionById($option->getOptionId());
++            if (!$persistedOption) {
++                throw new NoSuchEntityException();
++            }
++            $originalValues = $persistedOption->getValues();
++            $newValues = $option->getData('values');
++            if ($newValues) {
++                $newValues = $this->markRemovedValues($newValues, $originalValues);
++                $option->setData('values', $newValues);
++            }
++        }
+         $option->save();
+         return $option;
+     }
+
+app/code/Magento/Catalog/Model/Product/Option/SaveHandler.php
+public function execute($entity, $arguments = [])
+{
++        $options = $entity->getOptions();
++        $optionIds = [];
++
++        if ($options) {
++            $optionIds = array_map(function ($option) {
++                /** @var \Magento\Catalog\Model\Product\Option $option */
++                return $option->getOptionId();
++            }, $entity->getOptions());
++        }
++
+         /** @var \Magento\Catalog\Api\Data\ProductInterface $entity */
+         foreach ($this->optionRepository->getProductOptions($entity) as $option) {
+-            $this->optionRepository->delete($option);
++            if (!in_array($option->getOptionId(), $optionIds)) {
++                $this->optionRepository->delete($option);
++            }
+         }
+-        if ($entity->getOptions()) {
+-            foreach ($entity->getOptions() as $option) {
++        if ($options) {
++            foreach ($options as $option) {
+                 $this->optionRepository->save($option);
+             }
+         }
++
+         return $entity;
+     }
+ }
+
+app/code/Magento/Catalog/Model/Product/Option/Value.php
+public function saveValues()
+                 'store_id',
+                 $this->getOption()->getStoreId()
+             );
+-            $this->unsetData('option_type_id');
++
+             if ($this->getData('is_delete') == '1') {
+                 if ($this->getId()) {
+                     $this->deleteValues($this->getId());
+
+code/Magento/Catalog/Test/Unit/Controller/Adminhtml/Product/Initialization/HelperTest.php
+public function testInitialize()
+{
+ 	$this->customOptionMock->expects($this->once())
+     	->method('setProductSku');
+-   $this->customOptionMock->expects($this->once())
+-            ->method('setOptionId');
+ 
+

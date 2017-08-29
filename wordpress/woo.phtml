@@ -1,0 +1,67 @@
+
+<!-- Create template folder for woo -->
+Create woocommerce folder in root theme and copy all data from plugin/woocommerce/template/*
+
+
+<!-- Return string for wc_get_template_part get_template_part -->
+<?php // Edit file \wp-content\plugins\woocommerce\includes\wc-core-functions.php
+function sd_load_template_part($template_name, $part_name=null) {
+    ob_start();
+    wc_get_template_part($template_name, $part_name);
+    $var = ob_get_contents();
+    ob_end_clean();
+    return $var;
+}
+?>
+
+
+<!-- Add to cart function -->
+<?php
+global $woocommerce;
+$items = $woocommerce->cart->get_cart(); // Get items
+echo $woocommerce->cart->subtotal; // show subtotal
+echo $woocommerce->cart->cart_contents_count; // count all qty
+$woocommerce->cart->add_to_cart($id, $qty); // Add to cart 
+?>
+
+
+<!-- Get Categories -->
+<?php 
+$args = array(
+    'taxonomy' => "product_cat",
+    'orderby' => "name",
+    'order' => "ASC",  
+    'show_count' => 0,
+    'pad_counts' => 0,
+    'hierarchical' => 1,
+    'title_li' => $title,
+    'hide_empty' => 1,
+    'parent' => 0
+);
+$all_categories = get_categories( $args );
+?>
+
+
+<?php // fucntion.php
+
+// Get parent category of product
+function isCatering($proId) {
+    $terms = get_the_terms( $proId, 'product_cat' );
+    foreach ($terms as $prod_term) {
+        $product_cat_id = $prod_term->term_id;
+        $product_parent_categories_all_hierachy = get_ancestors( $product_cat_id, 'product_cat' );
+
+        $last_parent_cat = array_slice($product_parent_categories_all_hierachy, -1, 1, true);
+        foreach($last_parent_cat as $last_parent_cat_value){
+            if ($last_parent_cat_value === 25) return true;
+        }
+    }
+    return false;
+}
+
+?>
+
+
+
+
+

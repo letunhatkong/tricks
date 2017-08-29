@@ -1,0 +1,20 @@
+<!-- Fatal error: Maximum execution time of 30 seconds exceeded  -->
+set php.ini
+max_execution_time=300
+
+
+<!-- Duplicate url -->
+set wp-config.php
+define('WP_SITEURL', 'http://newdomain.com/wordpress');
+define('WP_HOME', 'http://newdomain.com/');
+
+
+<!-- Not display template page in admin page -->
+Reason: Check comment in top header in style.css of theme
+
+<!-- The called constructor method for WP_Widget is deprecated since version 4.3.0 -->
+$this->WP_Widget you might have to change it to parent::__construct
+
+
+
+<!-- Notice: id was called incorrectly. Product properties should not be accessed directly -->

@@ -1,4 +1,4 @@
-/* Adjust text */
+ Adjust text */
 * {
     -ms-text-size-adjust: 100%;
     -moz-text-size-adjust: 100%;
@@ -35,10 +35,11 @@ rem: Là đơn vị tham chiếu tỷ lệ so với phần tử gốc của mộ
 .mansory .item {
     display: inline-block;         
     margin: 0 0 15px;
-    width: 100%;
-    box-sizing: border-box;
+    width: 100%;    
     -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;       
+    -webkit-box-sizing: border-box;   
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;    
 }
 .mansory .item img {
     width: 100%;
@@ -47,6 +48,7 @@ rem: Là đơn vị tham chiếu tỷ lệ so với phần tử gốc của mộ
     .mansory {
         -moz-column-count: 3;
         -webkit-column-count: 3;
+        -ms-column-count: 2;
         column-count: 3;
     }
 }
@@ -54,6 +56,7 @@ rem: Là đơn vị tham chiếu tỷ lệ so với phần tử gốc của mộ
     .mansory {
         -moz-column-count: 2;
         -webkit-column-count: 2;
+        -ms-column-count: 2;
         column-count: 2;
     }
 }
@@ -83,7 +86,7 @@ rem: Là đơn vị tham chiếu tỷ lệ so với phần tử gốc của mộ
 #thumbs2-prev::before {
     top: 5px;
     -ms-transform:rotate(-45deg);/*IE9*/
-    -webkit-transform:rotate-45deg);
+    -webkit-transform:rotate(-45deg);
     transform: rotate(-45deg);
 }
 #thumbs2-next::before {
@@ -116,6 +119,8 @@ ul li div {
 
 ul li div:hover img, ul li div:focus img {
     -webkit-transform: scale(1.3);
+    -moz-transform: scale(1.3);
+    -ms-transform: scale(1.3);
     transform: scale(1.3);
 }
 
@@ -127,6 +132,8 @@ ul li div img {
 /*CSS: Reverse blocks*/
 .reverse {
     -webkit-transform: scaleY(-1);
+    -moz-transform: scaleY(-1);
+    -ms-transform: scaleY(-1);
     transform: scaleY(-1);
 }
 
@@ -234,6 +241,45 @@ ul li div img {
     }
 
 
+/* Center vertical bootstrap */
+.row {
+    display: flex;
+    align-items: center;
+}
+
+/* FLEX */
+/*https://css-tricks.com/snippets/css/a-guide-to-flexbox/*/
+.container {
+    display: flex; /* or inline-flex */
+    flex-direction: row; 
+    /*row (default): left to right in ltr; right to left in rtl
+    row-reverse: right to left in ltr; left to right in rtl
+    column: same as row but top to bottom
+    column-reverse: same as row-reverse but bottom to top*/
+
+    flex-wrap: wrap;
+    /*nowrap (default): all flex items will be on one line
+    wrap: flex items will wrap onto multiple lines, from top to bottom.
+    wrap-reverse: flex items will wrap onto multiple lines from bottom to top.*/
+
+    align-items: center;
+    /*flex-start: cross-start margin edge of the items is placed on the cross-start line
+    flex-end: cross-end margin edge of the items is placed on the cross-end line
+    center: items are centered in the cross-axis
+    baseline: items are aligned such as their baselines align
+    stretch (default): stretch to fill the container (still respect min-width/max-width)*/
+
+}
+
+.item {
+    order: 1;
+    flex-grow: 0; /* default 0 */
+}
+
+
+
+
+
 /* Short Text CSS */
 .sortTitle {
     width: calc(100% - 20px);
@@ -257,9 +303,20 @@ ul li div img {
    color: red;  
 }
 
+/* Hiển thị mũi tên lên xuống của input type number */
+input[type=number]::-webkit-inner-spin-button {
+    opacity: 1;
+}
+/* Remove arrow */
+input[type='number']::-webkit-inner-spin-button, 
+input[type='number']::-webkit-outer-spin-button { 
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /* Create Label tam giac */
 .isSalePr .product-image-wrapper:before {
-    content: '\00a0\00a0\00a0 SALE';
+    content: 'SALE';
     position: absolute;
     left: 0;
     bottom: 0;
@@ -277,7 +334,7 @@ ul li div img {
     border-bottom: 80px solid #000;
 }
 .isNewPr .product-image-wrapper:after {
-    content: '\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0\00a0 NEW';
+    content: 'NEW';
     top: 0;
     right: 0;
     position: absolute;
@@ -297,13 +354,36 @@ ul li div img {
 
 
 /* Hiệu ứng khi thay đổi grid / layout / responsive */
-div {
-    transition: all 300ms ease-in-out;
+div {    
     -moz-transition: all 300ms ease-in-out;
     -webkit-transition: all 300ms ease-in-out;
     -o-transition: all 300ms ease-in-out;
+    transition: all 300ms ease-in-out;
 }
 
 .syntax-background {
     background: bg-color bg-image position/bg-size bg-repeat bg-origin bg-clip bg-attachment initial|inherit;
+}
+
+/* Scroll css */
+.leftFilterBar::-webkit-scrollbar {
+    width: 12px;
+} 
+.leftFilterBar::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    -moz-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    border-radius: 10px;
+} 
+.leftFilterBar::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+    -moz-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }

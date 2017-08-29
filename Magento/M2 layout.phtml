@@ -1,5 +1,15 @@
+<!-- Add Css in admin -->
+file layout/default.xml
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+   <head><css src="css/style-add-product.css"/></head>
+</page>
 
-
+<!-- add javascript JS file -->
+In xml file
+<head>
+    <link src="Eadesigndev_Opicmsppdfgenerator::js/print.js"/>
+</head>
 
 <!-- Override theme layout xml -->
 {Magento2_root}app/design/frontend/<theme>/Magento_Checkout/layout/override/theme/Magento/blank/checkout_index_index.xml

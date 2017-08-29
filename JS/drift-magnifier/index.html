@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" media="screen, projection" href="./dist/drift-basic.css">
+    <style type="text/css">
+      body {
+        font-family: Helvetica Neue, Arial, sans;
+        margin-top: 2em;
+        background: #FAFAFA;
+      }
+
+      .wrapper {
+        margin: 0 auto;
+        width: 860px;
+      }
+
+      .drift-demo-trigger {
+        width: 40%;
+        float: left;
+      }
+
+      .detail {
+        position: relative;
+        width: 55%;
+        margin-left: 5%;
+        float: left;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <img class="drift-demo-trigger" data-zoom="http://assets.imgix.net/unsplash/lighthouse.jpg?w=1200&amp;ch=DPR&amp;dpr=2" src="http://assets.imgix.net/unsplash/lighthouse.jpg?w=400&amp;ch=DPR&amp;dpr=2">
+
+      <div class="detail">
+        <section>
+          <h1>Drift Demo</h1>
+          <p>This is a demo of Drift, a simple, lightweight, no-dependencies JavaScript "zoom on hover" tool from <a href="http://imgix.com">imgix</a>. Move your mouse over the image (or touch it) to see it in action.</p>
+          <p>This demo uses the simple included theme, but it's very easy to extend and customize to fit your needs. You can <a href="https://github.com/imgix/drift">learn more and download it here</a>.</p>
+        </section>
+        
+      </div>
+    </div>
+
+    <script src="dist/Drift.min.js"></script>
+    <script>
+      new Drift(document.querySelector('.drift-demo-trigger'), {
+        paneContainer: document.querySelector('.detail'),
+        zoomFactor: 2,
+        sourceAttribute: 'data-zoom',
+        inlinePane: false, // true: hien thi o trong hinh, false: hien thi ben ngoai       
+        // inlineOffsetX: 0,
+        // inlineOffsetY: 0,
+        containInline: true,
+        hoverBoundingBox: true, // False: Tat kinh lup khi hover. True: bat kinh lup
+        handleTouch: true,
+        touchBoundingBox: false,
+        // hoverDelay: 0,
+        onShow : function() {
+          console.log("kong dep treai");
+        }
+      });
+    </script>
+  </body>
+</html>

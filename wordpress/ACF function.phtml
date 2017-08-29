@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * Add section in admin page
+ * @position function.php
+ */
+if (function_exists('acf_add_options_page')) {
+    acf_add_options_page(
+        array(
+            'page_title' => 'Contact Info Settings',
+            'menu_title' => 'Contact Info Settings',
+            'menu_slug' => 'contact-info-settings',
+            'capability' => 'edit_posts',
+            'redirect' => true
+        )
+    );
+    acf_add_options_sub_page(
+        array(
+            'page_title' => 'General Info',
+            'menu_title' => 'General Info',
+            'parent_slug' => 'contact-info-settings'
+        )
+    );
+    acf_add_options_sub_page(
+        array(
+            'page_title' => 'Social Channels',
+            'menu_title' => 'Social Channels',
+            'parent_slug' => 'contact-info-settings'
+        )
+    );
+}
+
+// Get AFC options data
+$product_cat = get_field('category');
+$data = [];
+$fields_group = acf_get_fields('group_592fe3e9a7cda');
+foreach ($fields_group as $field) {
+    if (array_key_exists('conditional_logic', $field)) {                
+        $term = $field['conditional_logic'];
+        $name = $field['name'];
+        if (is_array($term) && $name !== "by" && $name !== "for") {             
+            foreach ($term[0] as $t) {                  
+                if ($t['operator'] == "==" && $t['value'] == $product_cat) {
+                    $array = []; $val = "";
+                
+                    if ($field["type"] === "checkbox" || $field["type"] === "select") {
+                        $checkboxField = get_field_object($name);
+                        $opVal = $checkboxField['value'];
+                        $opChoices = $checkboxField['choices'];
+                        
+                        if (is_array($opVal)) {
+                            foreach ($opVal as $k => $v) {
+                                $val .= $opChoices[$v] . ", ";
+                            }
+                        } else $val = $opChoices[$opVal];
+
+                        $val = rtrim($val,", ");                    
+                    } else $val = get_field($name);
+            
+                    $array["label"] = $field["label"];
+                    $array["value"] = $val;                 
+                    array_push($data, $array);
+                }
+            }                   
+        }
+    }
+}
+
+// Get Categories in ACF 
+$field = get_field_object('field_592fe43b7ae30');
+$categories = $field['choices'];
+
+?>

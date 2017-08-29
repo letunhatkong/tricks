@@ -20,6 +20,13 @@ $(location).attr('href');           //   http://www.test.com:8082/index.php#tab2
 $(location).attr('hash');          //    #tab2
 $(location).attr('search');        //    ?foo=123
 
+// Get value by Param in url
+function getUrlParam(name){
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (!results) return false;
+    return results[1] || 0;
+}
+
 // similar behavior as an HTTP redirect
 window.location.replace("http://stackoverflow.com");
 // similar behavior as clicking on a link
@@ -68,3 +75,62 @@ array = $.map(dataObj, function (value, index) {
     value.key = index;
     return [value];
 });
+
+
+// Print pdf
+var win = window.open("http://tradebanner.com/admin/opicmsppdfgenerator/order/printpdf/template_id/9/order_id/30/key/3b65c4548507c7575bb00a206c4d62481808fe942873f8cd410ef1a16f002913/"); window.print();
+// win.document.write('Some string')
+win.print();
+win.close();
+
+
+// Check object exists in array
+function checkObjInArray(obj, list) {
+    var i;
+    for (i = 0; i < list.length; i++) {
+        if ( JSON.stringify(list[i]) == JSON.stringify(obj) ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Check when scroll to bottom of page
+$(window).scroll(function (event) {
+    isEndOfPage = ($(window).scrollTop() + $(window).height() == $(document).height());
+});
+
+
+// Convert img to svg
+$('img.svg').each(function(){
+    var $img = $(this);
+    var imgID = $img.attr('id');
+    var imgClass = $img.attr('class');
+    var imgURL = $img.attr('src');
+    $.get(imgURL, function(data) {
+        // Get the SVG tag, ignore the rest
+        var $svg = $(data).find('svg');
+        // Add replaced image's ID to the new SVG
+        if(typeof imgID !== 'undefined') {
+            $svg = $svg.attr('id', imgID);
+        }
+        // Add replaced image's classes to the new SVG
+        if(typeof imgClass !== 'undefined') {
+            $svg = $svg.attr('class', imgClass+' replaced-svg');
+        }
+        // Remove any invalid XML tags as per http://validator.w3.org
+        $svg = $svg.removeAttr('xmlns:a');
+        // Check if the viewport is set, if the viewport is not set the SVG wont't scale.
+        if(!$svg.attr('viewBox') && $svg.attr('height') && $svg.attr('width')) {
+            $svg.attr('viewBox', '0 0 ' + $svg.attr('height') + ' ' + $svg.attr('width'));
+        }
+        // Replace image with new SVG
+        $img.replaceWith($svg);
+    }, 'xml');
+});
+
+// Validate email
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}

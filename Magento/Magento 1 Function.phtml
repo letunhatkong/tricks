@@ -270,6 +270,11 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-l
 RewriteRule . index.php [L]
 
+<!-- Find admin path -->
+Find in local.xml file
+Find in core_config_data table
+admin/url/use_custom_path 1
+admin/url/custom_path backoffice
 
 <!--INSTALL MAGENTO 1 IN LINUX-->
 Read more:
@@ -331,6 +336,8 @@ sudo php5enmod mcrypt
 4/ Create DATABASE
 mysql -u root -p
 CREATE DATABASE magento DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci; CREATE USER magento@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON magento.* TO magento@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES; 
+
+
 
 
 5/ Copy magento folder to this path /var/www/html/

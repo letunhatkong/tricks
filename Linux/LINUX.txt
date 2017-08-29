@@ -13,13 +13,50 @@ rsync -avz fromFolder toFolder
 -P : View informations
 
 =========== TAR - ZIP UNZIP
-Nén: tar -zcvf tên_file folder_cần_nén
+c – Creates a new .tar archive file.
+x – extract a archive file.
+z – filter archive through gzip.
+v – Verbosely show the .tar file progress.
+f – File name type of the archive file.
+
+Nén: 
+sudo tar -zcvf tên_file folder_cần_nén
 Nén zip: zip archivename.zip file1 file2 folder1
 zip -r archivename.zip folder/
 
-Giải nén: tar -xvf file_nén
-giải nén đến 1 thư mục nào đó: unzip file.zip -d destination_folder
-tar -xvf file -C folder
+Giải nén: 
+sudo tar -xvf file_nén
+giải nén đến 1 thư mục nào đó: sudo unzip file.zip -d destination_folder
+sudo tar -xvf file -C folder
+
+
+GZIP
+-c, --stdout      write on standard output, keep original files unchanged
+-d, --decompress  decompress
+-f, --force       force overwrite of output file and compress links
+-h, --help        give this help
+-k, --keep        keep (don't delete) input files
+-l, --list        list compressed file contents
+-L, --license     display software license
+-n, --no-name     do not save or restore the original name and time stamp
+-N, --name        save or restore the original name and time stamp
+-q, --quiet       suppress all warnings
+-r, --recursive   operate recursively on directories
+-S, --suffix=SUF  use suffix SUF on compressed files
+-t, --test        test compressed file integrity
+-v, --verbose     verbose mode
+-V, --version     display version number
+-1, --fast        compress faster
+-9, --best        compress better
+--rsyncable       Make rsync-friendly archive
+
+Nén:
+$ gzip file_compress
+$ gzip -5 file_compress.ext
+
+Giải nén:
+$ gunzip file_compress.ext.gz
+$ gzip -d file_compress.ext.gz
 
 =========== Kiểm tra kích thước của folder linux 
 du -sh folder/
@@ -30,6 +67,10 @@ df // xxx ~ Đơn vị tính là KB. Lấy số này chia cho 1024*1024 là ra s
 =========== Rename folder 
 mv folder-old folder-new
 
+
+<!-- Set timezone -->
+sudo timedatectl set-timezone UTC
+sudo nano /etc/timezone
 
 
 ============ APACHE ============
@@ -46,7 +87,8 @@ sudo service mysql start / stop / restart
 sudo service mysqld start / stop / restart
 sudo /etc/init.d/mysqld start / stop / restart
 
-Trên linux, socket nó cũng là file thôi. Bị lỗi socket thì thường là do số lượng kết nối vô nhiều -> tới ngưỡng open files. Kiểm tra nếu là ổ SSD thì tăng openfiles lên thôi 
+Trên linux, socket nó cũng là file thôi. Bị lỗi socket thì thường là do số lượng kết nối vô nhiều -> tới ngưỡng open files. 
+Kiểm tra nếu là ổ SSD thì tăng openfiles lên thôi 
 
 Tài nguyên server có hạn, cũng không thể tăng mãi được :D
 Phải profiler để tính toán chia tài nguyên cho mỗi dịch vụ
@@ -55,9 +97,12 @@ Nếu được thì setup thêm memcached vô Rồi cấu hình nginx cho cache 
 
 Backup db mysql: mysqldump -u tradebanner -p tradebanner2 > backup_name.sql
 Import db.sql vao db. Tạo database trống trên MySQL
-Terminal: mysql -u root -p db_name < db.sql
+Terminal: mysql -u tradebanner -p tradebanner < kong.sql
 
 mysql -u tradebanner -p wp3 < 
+
+Import file.sql.gz to database mysql
+sudo zcat /path/to/file.sql.gz | mysql -u 'root' -p your_database
 
 ===== Tăng openfiles
 Check:
@@ -115,6 +160,12 @@ server { # simple reverse-proxy
     proxy_pass      http://127.0.0.1:8080;
   }
 }
+
+NGINX COMMANDs
+
+Enable site List 
+find /etc/nginx -maxdepth 2 \( -path "*/conf.d/*.conf" -or -path "*/sites-enabled/*" \)
+
 
 =========== VI =====
 Ctrl-b | Go back one page
@@ -322,6 +373,18 @@ sudo apt-get -y update; sudo add-apt-repository ppa:ondrej/php; sudo apt-get -y 
 =========================================
 
 
+<!-- Email -->
+sudo apt-get install sendmail
+sudo sendmailconfig
+sudo service apache2 restart
+
+sudo service sendmail stop/start/status
+
+Check sendmail
+sudo netstat -tulpn
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      17534/sendmail: MTA
+tcp        0      0 127.0.0.1:587           0.0.0.0:*               LISTEN      17534/sendmail: MTA
+
 
 <!-- Hot Key Ubuntu -->
 New tab -> Ctrl+T
@@ -445,6 +508,12 @@ sudo yum install vixie-cron crontabs
 
 Edit file cron: crontab -e
 View command file: crontab -l
+
+View log file
+sudo nano /var/log/syslog
+
+sudo service cron status/start/stop
+/etc/init.d/cron status
 
 * * * * * /path/to/command
 minute hour day-of-month month day-of-week

@@ -1,0 +1,71 @@
+
+<!-- Do action after cart is updated -->
+<script type="text/javascript">
+jQuery(document.body).on('updated_cart_totals', function() {  
+    // Not apply when items = 0
+});
+jQuery(document.body).on('updated_wc_div', function() {  
+});
+</script>
+
+
+
+<?php // function.php
+
+// Sort cart item by product name
+add_action( 'woocommerce_cart_loaded_from_session', function() {
+    global $woocommerce;
+    $products_in_cart = array();
+    foreach ( $woocommerce->cart->cart_contents as $key => $item ) {
+        $products_in_cart[ $key ] = $item['data']->get_title();
+    }
+    natsort( $products_in_cart );
+    $cart_contents = array();
+    foreach ( $products_in_cart as $cart_key => $product_title ) {
+        $cart_contents[ $cart_key ] = $woocommerce->cart->cart_contents[ $cart_key ];
+    }
+    $woocommerce->cart->cart_contents = $cart_contents;
+}, 100 );
+
+// Disabling AJAX for Cart Page. In function.php
+function cart_script_disabled(){
+    wp_dequeue_script( 'wc-cart' );
+}
+add_action( 'wp_enqueue_scripts', 'cart_script_disabled' );
+
+
+?>
+
+
+<?php 
+// Merge option type checkbox into one row in cart item.
+// Edit plugins\woocommerce-product-add-ons\classes\class-product-addon-cart.php
+function get_item_data( $other_data, $cart_item ) {
+    if ( ! empty( $cart_item['addons'] ) ) {
+        $checkName = [];
+        foreach ( $cart_item['addons'] as $addon ) {
+
+            $name = $addon['name'];         
+            $val = $addon['value'];
+
+            if ( $addon['price'] > 0 && apply_filters( 'woocommerce_addons_add_price_to_name', '__return_true' ) ) {
+                $val .= ' (' . wc_price( get_product_addon_price_for_display( $addon['price'], $cart_item[ 'data' ], true ) ) . ')';
+            }
+            
+            if (in_array($name, $checkName)) {
+                $index = array_search($name, $checkName);
+                $val = $other_data[$index]['value'] . ", " . $val;
+                $other_data[$index]['value'] = $val;
+            } else {
+                $checkName[] = $name;
+                $other_data[] = array(
+                    'name'    => $name,
+                    'value'   => $val,
+                    'display' => isset( $addon['display'] ) ? $addon['display'] : ''
+                    );
+            }  
+        }
+    }
+    return $other_data;
+}
+?>

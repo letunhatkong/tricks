@@ -1,36 +1,34 @@
-<!-- Re-INDEX -->
-sudo php bin/magento indexer:reindex
-
-<!-- Re-DEPLOY -->
-sudo php bin/magento setup:static-content:deploy
+<!-- Re-DEPLOY --> 
 // M2 có 2 chế độ symlink and copy. deploy content => copy.
 // Nếu M2 ko tự động tạo symlink khi F5 page thì có nghĩa là cần xem lại file .htaccess của thư mục pub/static
-https://github.com/magento/magento2/blob/develop/pub/static/.htaccess
 
-sudo rm -rf var/cache/ var/page_cache/ var/view_preprocessed/ var/composer_home/ pub/static/* var/generation/; sudo php bin/magento setup:static-content:deploy; sudo php bin/magento indexer:reindex; sudo chmod -R 777 var/ pub/ app/design;
+<!-- Deploy static file -->
+sudo rm -rf pub/static/*; sudo php bin/magento setup:static-content:deploy; sudo chmod -R 777 var/ pub/ app/design;
 
-cd /home/ubuntu/tradebanner/; git pull; sudo rsync -avP . /var/www/html/; cd /var/www/html/; sudo rm -rf var/cache/ var/page_cache/ var/view_preprocessed/ var/composer_home/ pub/static/* var/generation/ var/di; sudo php bin/magento setup:static-content:deploy; sudo php bin/magento indexer:reindex; sudo chmod -R 777 var/ pub/;
+<!-- Update module and static file -->
+sudo rm -rf var/cache/* var/page_cache/* var/generation/* var/view_preprocessed/*; sudo php bin/magento setup:upgrade; sudo rm -rf pub/static/*; sudo php bin/magento setup:static-content:deploy; sudo chmod -R 777 var/ pub/;
+
+
+<!-- Update module and static file + re-index -->
+sudo rm -rf var/cache/* var/page_cache/* var/generation/*; sudo php bin/magento setup:upgrade; sudo rm -rf pub/static/*; sudo php bin/magento setup:static-content:deploy; sudo php bin/magento indexer:reindex; sudo chmod -R 777 var/ pub/ app/design; sudo php bin/magento cache:clean; sudo php bin/magento cache:flush;
+
+<!-- Clear all and re-build -->
+sudo rm -rf var/; sudo php bin/magento setup:upgrade; sudo chmod -R 777 var/ pub/; sudo rm -rf pub/static/*; sudo php bin/magento setup:static-content:deploy; sudo php bin/magento indexer:reindex; sudo chmod -R 777 var/ pub/ app/design; 
 
 sudo rm -rf var/cache/ var/page_cache/ var/view_preprocessed/ var/composer_home/ var/generation/ var/di/; 
 
-
-sudo rm -rf var/cache/ var/page_cache/ var/view_preprocessed/ pub/static/* ; 
-sudo php bin/magento setup:static-content:deploy; 
-sudo chmod -R 777 var/ pub/;
-
 <!-- Upgrade -->
-sudo php bin/magento setup:upgrade; sudo chmod -R 777 var/ pub/;
-sudo rm -rf var/di/; sudo php bin/magento setup:di:compile;
+sudo rm -rf var/cache/* var/page_cache/* var/generation/*; sudo php bin/magento setup:upgrade; sudo chmod -R 777 var/ pub/;
 
-<!-- Add new theme -->
-sudo php bin/magento deploy:mode:show
-sudo php bin/magento deploy:mode:set developer
-Server phai bat developer mode
+<!-- Compile -->
+sudo rm -rf var/di/; sudo php bin/magento setup:di:compile; 
+
+<!-- Re-INDEX -->
+sudo php bin/magento indexer:reindex; sudo chmod -R 777 var/ pub/;
 
 <!-- CLEAR CACHE -->
-Go to magento folder and type: 
-sudo php bin/magento cache:clean
-sudo php bin/magento cache:fluid
+sudo php bin/magento cache:clean; sudo php bin/magento cache:flush;
+
 Edit code trong html 
 sudo rm -rf var/cache/ var/page_cache/ var/view_preprocessed/ var/composer_home/  pub/static/* var/generation/ var/di
 
@@ -38,9 +36,23 @@ sudo rm -rf var/cache/ var/page_cache/ var/view_preprocessed/ var/composer_home/
 sudo php bin/magento deploy:mode:show
 sudo php bin/magento deploy:mode:set developer
 sudo php bin/magento deploy:mode:set production
+sudo rm -rf var/cache/* var/page_cache/* var/generation/*; sudo php bin/magento setup:upgrade; sudo rm -rf pub/static/*; sudo php bin/magento setup:static-content:deploy; sudo chmod -R 777 var/ pub/ app/design;
+
+
+php bin/magento setup:store-config:set --base-url="http://dev.tradebanner.com/"
+php bin/magento setup:store-config:set --base-url-secure="http://dev.tradebanner.com/"
 
 <!-- List Module Status -->
 sudo php bin/magento module:status
+<!-- Remove Module -->
+Remove all related tabel, and remove module in setup_module table
+DROP TABLE IF EXISTS magefan_blog_category, magefan_blog_category_store;
+DELETE FROM setup_module WHERE module = "Magefan_Blog";
+sudo php bin/magento module:uninstall Magentostudy_News --backup-code --backup-media --backup-db --clear-static-content
+<!-- Disable Module -->
+sudo php bin/magento module:disable Lexim_Catalog
+<!-- Enable Module -->
+php bin/magento module:enable Sahy_Banner --clear-static-content
 
 <!-- Install MAGENTO 2 -->
 1/ Install apache2: sudo apt-get install apache2 
@@ -87,12 +99,12 @@ sudo nano /etc/apache2/sites-available/magento.conf
     DocumentRoot /var/www/html/siva
     ServerName siva.vn
 
-    <Directory /var/www/html/siva>
-        Allow from all
-        Options Indexes FollowSymLinks MultiViews
-        AllowOverride All
-        Order allow,deny
-    </Directory>
+<Directory /var/www/html>
+    Allow from all
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride All
+    Order allow,deny
+</Directory>
 
     ErrorLog ${APACHE_LOG_DIR}/siva-log.log
     CustomLog ${APACHE_LOG_DIR}/siva-access.log combined
@@ -107,32 +119,42 @@ sudo service apache2 restart
 
 5/ Create DATABASE
 mysql -u root -p
-CREATE DATABASE tradebanner DEFAULT CHARACTER SET utf8; CREATE USER tradebanner@localhost IDENTIFIED BY 'simple123'; GRANT ALL PRIVILEGES ON tradebanner.* TO tradebanner@localhost IDENTIFIED BY 'simple123'; FLUSH PRIVILEGES; 
+
+CREATE DATABASE teletron DEFAULT CHARACTER SET utf8; CREATE USER tradebanner2@localhost IDENTIFIED BY 'simple123'; GRANT ALL PRIVILEGES ON tradebanner2.* TO tradebanner2@localhost IDENTIFIED BY 'simple123'; FLUSH PRIVILEGES; 
+
+CREATE DATABASE teletron DEFAULT CHARACTER SET utf8; CREATE USER teletron@localhost IDENTIFIED BY 'simple123'; GRANT ALL PRIVILEGES ON teletron.* TO teletron@localhost IDENTIFIED BY 'simple123'; FLUSH PRIVILEGES; 
+
+CREATE DATABASE test DEFAULT CHARACTER SET utf8; CREATE USER test@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON test.* TO test@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES; 
+
+CREATE USER tradebanner2@localhost IDENTIFIED BY 'simple123'; GRANT ALL PRIVILEGES ON tradebanner2.* TO tradebanner2@localhost IDENTIFIED BY 'simple123'; FLUSH PRIVILEGES; 
+
 
 6/ Permission folders and files
 cd to /var/www/html and type: sudo chown -R :www-data magento-folder
 
-sudo find . -type d -exec chmod 775 {} \; && sudo find . -type f -exec chmod 664 {} \; && sudo chmod -R 777 bin/magento var/ pub/ app/etc/ app/design/frontend/; 
+sudo find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
+sudo find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \; sudo chmod u+x bin/magento;
 
-sudo find . -type d -exec chmod 777 {} \; && sudo find . -type f -exec chmod 664 {} \; && sudo chmod -R 777 bin/magento var/ pub/ app/etc/ app/design/frontend/ .idea/ .git/ .gitignore;
+sudo find . -type d -exec chmod 775 {} \; 
+sudo find . -type f -exec chmod 664 {} \;
+sudo chmod -R 777 var/ pub/ app/etc/ app/design/frontend/; sudo chmod u+x bin/magento;
+
+sudo find . -type d -exec chmod 777 {} \; 
+sudo find . -type f -exec chmod 664 {} \;  
+sudo chmod -R 777 bin/magento var/ pub/ app/etc/ app/design/frontend/ .idea/ .git/ .gitignore;
+
+sudo find . -type f -exec chmod 644 {} \; && sudo find . -type d -exec chmod 755 {} \; 
+sudo chmod -R 777 var/ pub/ app/etc;
+
+
 
 7/ Go to http://localhost/project-name/setup/
 
-<!-- Remove Module -->
-Remove all related tabel, and remove module in setup_module table
-DROP TABLE IF EXISTS magefan_blog_category, magefan_blog_category_store;
-DELETE FROM setup_module WHERE module = "Magefan_Blog";
-sudo php bin/magento module:uninstall Magentostudy_News --backup-code --backup-media --backup-db --clear-static-content
-<!-- Disable Module -->
-sudo php bin/magento module:disable Lexim_Catalog
-<!-- Enable Module -->
-php bin/magento module:enable Sahy_Banner --clear-static-content
+
 
 <!-- Update Magento 2 -->
-The second way is with composer:
 In composer.json change this line
-"magento/product-community-edition": "2.0.0",
-Also you should change the line 5 as well "version": "2.0.0", to keep it in sync.
+"magento/product-community-edition": "2.0.0", Also you should change the line 5 as well "version": "2.0.0", to keep it in sync.
 to whatever version you want, and then run:
 composer update
 php bin/magento setup:upgrade
@@ -147,3 +169,6 @@ php bin/magento cache:enable
 
 <!-- ===== UPDATE URL BASE ==== -->
 UPDATE core_config_data SET value = 'http://tradebanner.com/' WHERE config_id = 2; UPDATE core_config_data SET value = 'https://tradebanner.com/' WHERE config_id = 3; 
+
+
+

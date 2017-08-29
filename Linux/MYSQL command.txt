@@ -1,9 +1,8 @@
-1. Thư mục chứa database
+<!-- 1. Thư mục chứa database -->
 
 Trên CentOS, toàn bộ file raw database được lưu trong thư mục /var/lib/mysql
 
-2. Quản lý tài khoản và phân quyền
-
+<!-- 2. Quản lý tài khoản và phân quyền -->
 Hiển thị toàn bộ users:
 mysql> SELECT * FROM mysql.user;
 
@@ -32,10 +31,14 @@ Xóa user:
 mysql> DELETE FROM mysql.user WHERE user="username";
 
 
-3. Các thao tác database
+<!-- 3. Các thao tác database -->
+Connect to database
+mysql -u root -p
+mysql -h rds-sm.cjusylnn6ydk.us-west-2.rds.amazonaws.com -P 3306 -u root -p
 
 Hiển thị toàn bộ databases:
 mysql> SHOW DATABASES;
+
 Tạo database:
 mysql> CREATE DATABASE mydatabase;
 
@@ -51,8 +54,9 @@ $ sudo mysqlcheck -o --all-databases -u root -p
 Single Database:
 $ sudo mysqlcheck -o db_schema_name -u root -p
 
-4. Các thao tác table
 
+
+<!-- 4. Các thao tác table -->
 Tất cả các thao tác bên dưới bạn phải lựa chọn trước database bằng cách dùng lệnh: mysql> USE mydatabase;
 
 Hiển thị toàn bộ table:
@@ -69,8 +73,9 @@ mysql> ALTER TABLE mytable rename as mynewtable;
 Xóa table:
 mysql> DROP TABLE mytable;
 
-5. Các thao tác cột và hàng
 
+
+<!-- 5. Các thao tác cột và hàng -->
 Tất cả các thao tác bên dưới bạn phải lựa chọn trước database bằng cách dùng lệnh: mysql> USE mydatabase;
 
 Hiển thị các column trong table:
@@ -93,25 +98,40 @@ mysql> DELETE FROM mytable WHERE mycolumn="mydata";
 Cập nhật dữ liệu trong table:
 mysql> UPDATE mytable SET column1="mydata" WHERE column2="mydata";
 
-6. Các thao tác sao lưu và phục hồi
 
-Sao lưu toàn bộ database bằng lệnh (chú ý không có khoảng trắng giữa -p và mật khẩu):
+
+
+<!-- 6. Các thao tác sao lưu và phục hồi -->
+
+<!-- Sao lưu toàn bộ database bằng lệnh (chú ý không có khoảng trắng giữa -p và mật khẩu): -->
 mysqldump -u root -pmypass --all-databases > alldatabases.sql
 
-Sao lưu một database bất kỳ:
+<!-- Sao lưu một database bất kỳ: -->
 mysqldump -u username -pmypass databasename > database.sql
+mysqldump -u root -pT3l3tr0n teletron > teletron.sql
 
-Khôi phục toàn bộ database bằng lệnh:
-mysql -u username -pmypass < alldatabases.sql (no space in between -p and mypass)
-
-Khôi phục một database bất kỳ:
-mysql -u username -pmypass databasename < database.sql
-
-Chỉ sao lưu cấu trúc database:
+<!-- Chỉ sao lưu cấu trúc database: -->
 mysqldump --no-data --databases databasename > structurebackup.sql
-
-Chỉ sao lưu cấu trúc nhiều database:
 mysqldump --no-data --databases databasename1 databasename2 databasename3 > structurebackup.sql
 
-Sao lưu một số table nhất định:
+<!-- Sao lưu một số table nhất định: -->
 mysqldump --add-drop-table -u username -pmypass databasename table_1 table_2 > databasebackup.sql
+
+
+<!-- Khôi phục toàn bộ database bằng lệnh: -->
+mysql -u username -pmypass < alldatabases.sql 
+mysql -u username -pmypass databasename < database.sql
+sudo zcat 10mar-17h.sql.gz | mysql -u 'teletron' -psimple123 database
+
+
+
+
+<!-- Check timezone db -->
+SELECT @@global.time_zone, @@session.time_zone;
+SET time_zone = 'America/Los_Angeles';
+SET time_zone = "+00:00";
+SET @@session.time_zone = "+00:00"; SET @@global.time_zone='+00:00';
+SET GLOBAL time_zone = '+0:00';
+SET @@global.time_zone='+00:00';
+
+

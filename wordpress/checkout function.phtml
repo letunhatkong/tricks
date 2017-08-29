@@ -1,0 +1,108 @@
+
+<!-- CHECK OUT PAGE -->
+
+<!-- Disable ajax reload page -->
+Rename class form "checkout" to "checkout1" in woocommerce/checkout/form-checkout.php
+
+<!-- Send another email after checkout  -->
+plugins\woocommerce\includes\emails\class-wc-email-new-order.php
+get $storeEmail = get_post_meta( $order_id, "_billing_store_email", true);
+
+<!-- Fix bug scroll to top in checkout page -->
+<script type="text/javascript">
+    jQuery( document.body ).on( 'checkout_error', function() {
+        jQuery( 'html, body' ).animate({
+            scrollTop: 0
+        }, 500); 
+    });
+
+</script>
+
+<!-- Remove Billing, Shipping text in error mess -->
+Go to class-wc-checkout.php
+Find "is a required field" 
+$field_label = sprintf( _x( '%s', 'Billing FIELDNAME', 'woocommerce' ), $field['label'] );
+
+
+<?php
+// START FUNCTION.PHP
+
+
+// Set default stage, country, and zipcode
+// describe in woocommerce/includes/class-wc-deprecaed-filter-hooks.php
+add_filter( 'default_checkout_country', 'xa_set_default_checkout_country' );
+function xa_set_default_checkout_country() {
+    return 'US';
+}
+add_filter( 'default_checkout_state', 'xa_set_default_checkout_state' );
+function xa_set_default_checkout_state() {
+    return 'VA';
+}
+add_filter( 'default_checkout_postcode', 'xa_set_default_checkout_postcode' );
+function xa_set_default_checkout_postcode() {
+    return '123456';
+}
+
+/**
+ * Add custom billing_fields in woocommerce
+ * @param  array $fields 
+ * @return void
+ */
+function custom_woocommerce_billing_fields($fields) {
+    $fields['store_email'] = array(
+        'label' => __('Select store where you buy', 'woocommerce'), 
+        'placeholder' => _x('', 'placeholder', 'woocommerce'), 
+        'required' => true,
+        'clear' => false,
+        'type' => 'select', 
+        'options' => array(
+            'letunhatkong@gmail.com' => 'Store 1 - Mr. J’S Bagels East Market Street',
+            'kong.le@seadev.com.vn' => 'Store 2 - Mr. J’S Bagels South High Street',
+            'quang.than@seadev.com.vn' => 'Store 3 - Mr. J’S Bagels Virginia Ave',
+        )
+    );
+
+    $fields['billing_options'] = array(
+        'label' => __('NIF', 'woocommerce'), // Add custom field label
+        'placeholder' => _x('Your NIF here....', 'placeholder', 'woocommerce'), // Add custom field placeholder
+        'required' => true, // if field is required or not
+        'clear' => false, // add clear or not
+        'type' => 'text', // add field type
+        'class' => array('my-css')    // add class name
+    );
+
+    return $fields;
+}
+add_filter('woocommerce_billing_fields', 'custom_woocommerce_billing_fields');
+
+
+/**
+ * Edit field
+ * https://docs.woocommerce.com/document/tutorial-customising-checkout-fields-using-actions-and-filters/
+ * @return [type]         [description]
+ */
+function custom_override_checkout_fields( $fields ) {
+    unset($fields['billing']['billing_company']); // Remove company field    
+    return $fields;
+}
+add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
+
+/**
+* Update the order meta with field value
+*/
+function save_custom_checkout_field( $order_id ) {
+    if ( ! empty($_POST['store_email']) ) {
+        update_post_meta( $order_id, '_billing_store_email', sanitize_text_field($_POST['store_email']) );
+    }
+}
+add_action('woocommerce_checkout_update_order_meta', 'save_custom_checkout_field');
+
+/**
+ *  Remove payment gateway
+ */
+add_filter('woocommerce_cart_needs_payment', '__return_false');
+
+// END FUNCTION.PHP
+?>
+
+

@@ -1,0 +1,303 @@
+
+<!-- Create template for a static page -->
+in root theme folder, create file page-slugPage.php
+
+<!-- Remove style shoetrap -->
+Cmt this line in theme/shoetrap/lib/scripts.php
+//wp_enqueue_style( 'shoestrap_css', $stylesheet_url, false, $stylesheet_ver );
+
+
+<!-- Get post meta data by id and key -->
+get_post_meta( $id, "_billing_store_email", true); 
+
+<?php
+// START FUNCTION.PHP
+
+/**
+ *  Add  new column in admin wordpress 
+ * @param [type] $defaults [description]
+ */
+function ST4_columns_head($defaults) {
+    $defaults['category_acf'] = 'Category';
+    return $defaults;
+}
+add_filter('manage_posts_columns', 'ST4_columns_head');
+
+
+/**
+ * Custom search only product
+ */
+function searchfilter($query) {
+    if ( $query->is_search && !is_admin() && $query->is_main_query() ) {     
+        $query->set('post_type', 'product');
+    }    
+    return $query;
+}
+add_filter('pre_get_posts','searchfilter'); 
+
+
+// Show data in category
+function showCategoryColumnInAdmin($column_name, $postId) {
+    if ($column_name == 'product_cat') { // product_cat
+        $post = wc_get_product( $postId );
+        if ($post) {
+            $a = get_field('category', $postId);    
+            echo $a;    
+        }
+    }
+}
+add_action('manage_posts_custom_column', 'showCategoryColumnInAdmin', 10, 2);
+
+
+/**
+ * Update CSS in Admin page
+ */
+function admin_style() {
+  wp_enqueue_style('admin-styles', get_stylesheet_directory_uri() .'/admin-custom.css');
+}
+add_action('admin_enqueue_scripts', 'admin_style');
+
+
+// END FUNCTION.PHP
+?>
+
+<!-- Get product  -->
+<?php
+
+// Query by meta_query
+$meta_query = [
+    'relation' => 'AND',
+    array(
+      'key'     => $key,
+      'value'   => $value,
+      'compare' => 'like'		
+      ),
+    array(
+      'key'     => $key,
+      'value'   => $value,
+      'compare' => '='		
+    )
+];
+
+$args = array(
+    'post_type' => 'product',
+    'status' => 'publish',
+    'p' => $id,
+    'posts_per_page' => -1,
+    'meta_query' => $meta_query,
+    'orderby' => 'date', // date is primary, title
+	'order'  => 'ASC' // default is DESC
+);
+
+// order by featured product
+$productArgs = array( 
+    'post_type' => 'product',
+    'product_cat' => $sub_category->slug, 
+    'orderby' => "meta_value", 
+    'order' => "DESC",
+    'meta_key' => '_featured'
+);
+
+// order by featured first, name later
+$productArgs = array( 
+    'post_type' => 'product',
+    'status' => 'publish',
+    'product_cat' => $sub_category->slug, 
+    'orderby' =>  array(
+        'meta_value' => 'DESC',
+        'name' => 'ASC'
+    ), 
+    'meta_key' => '_featured'
+);
+
+$loop = new WP_Query( $productArgs );
+
+// Order by price
+$args = array(
+    'post_type' => 'product',
+    'status' => 'publish',
+    'posts_per_page' => -1,
+    'meta_query' => $meta_query,
+    'orderby' => 'meta_value_num', 
+	'order'  => 'ASC', // default is DESC
+	'meta_key' => '_price'
+);
+$query = new WP_Query($args);
+
+
+/**
+* WP_Tax_Query
+* https://developer.wordpress.org/reference/classes/wp_tax_query/__construct/
+* + 'relation' (string) Optional. The MySQL keyword used to join the clauses of the query. Accepts 'AND', or 'OR'. Default 'AND'.
+* + (array) Optional. An array of first-order clause parameters, or another fully-formed tax query.
+*     - 'taxonomy' string The taxonomy being queried
+*     - 'terms' string|array The list of terms
+*     - 'field' string (optional) Which term field is being used.
+*              Possible values: 'term_id', 'slug' or 'name'
+*              Default: 'term_id'
+*     - 'operator' string (optional)
+*              Possible values: 'AND', 'IN', 'NOT IN', 'EXISTS', 'NOT EXISTS'.
+*              Default: 'IN'          
+*     - 'include_children' bool (optional) Whether to include child terms.
+*              Default: true
+**/
+// Get products by tags
+$args = array(
+    'post_type' => 'product',
+    'status' => 'publish',
+    'tax_query' => array(
+        [
+            'taxonomy' => 'product_tag',
+            'field' => 'slug',
+            'terms' => "full",
+            'operator' => 'IN'
+        ],
+        [
+            'taxonomy' => 'product_tag',
+            'field' => 'slug',
+            'terms' => "twin",
+            'operator' => 'IN'
+        ]
+    )
+);
+$loop = new WP_Query( $args );
+
+
+// Query by featured products
+$tax_query[] = array(
+    'taxonomy' => 'product_visibility',
+    'field'    => 'name',
+    'terms'    => 'featured',
+    'operator' => 'IN',
+);
+$args = array(
+    'post_type'   =>  'product',
+    'status' => 'publish',
+    'orderby'     =>  'date',
+    'order'       =>  'DESC',
+    'posts_per_page' => 10,
+    'tax_query'      => $tax_query
+);
+$loop = new WP_Query( $args );
+
+
+// Query both meta_query and tax_query
+$args = array(
+    'post_type'      => 'product',
+    'status'         => 'publish',
+    'posts_per_page' => 100,
+    'offset'         => 0,
+    'orderby'        => "date",
+    'meta_query'     => [
+        [
+            'key'     => 'category',
+            'value'   => 'precuts',
+            'compare' => 'like'
+        ]
+    ],
+    'order'          => "ASC",
+    'tax_query'      => array(
+        [
+            'taxonomy' => 'product_tag',
+            'field'    => 'slug',
+            'terms'    => "fat-quarters",
+            'operator' => 'IN'
+        ]
+    )
+);
+
+// Get data after query
+$query = new WP_Query($args);
+while ($query->have_posts()) {
+    $query->the_post();
+
+    $id = get_the_ID();
+    $product = new WC_Product($id);
+    $price = $product->get_price();
+    $title = get_the_title();
+    $imgUrl = get_the_post_thumbnail_url();
+    $detailUrl = get_permalink();
+
+    $data = array(
+        'title' => $title,
+        'thumbUrl' => $imgUrl,
+        'price' => $price,
+        'url' => $detailUrl
+       );
+    array_push($items, $data);         
+};
+
+
+?>
+
+
+<!-- Product -->
+\wp-content\plugins\woocommerce\includes\abstracts\abstract-wc-product.php
+<?php 
+global $post;
+$product->get_id();
+$product->get_title();
+$product->get_description();
+$product->post->post_content; // content
+$product->post->post_excerpt; // short description
+$product->get_sku();
+$product->get_permalink();
+$product->get_weight();
+$product->get_length();
+$product->get_width();
+$product->is_featured(); // bool
+
+// Get product woocommerce by id
+$post = wc_get_product( $post_ID );
+$val = get_field('category', $postId);
+
+// Get sort description
+echo apply_filters( 'woocommerce_short_description', $post->post_excerpt );
+
+// Get thumbnail
+$thumb_id = get_post_thumbnail_id();
+$thumb_url = wp_get_attachment_image_src($thumb_id,'thumbnail-size', true);
+echo $thumb_url[0];
+
+// Get hinh goc
+$imgUrl = get_the_post_thumbnail_url();
+the_post_thumbnail_url();
+wp_get_attachment_url( $attachment_id );
+
+// Add custom size in function.php and call
+add_theme_support( 'grid-card-thumbnail', 'post' );
+add_image_size( 'grid-card-thumbnail', 1024, 720, true );
+$customSize = wp_get_attachment_image_src($thumb_id,'grid-card-thumbnail', true);
+
+// Get resized featured image by woocommerce
+$image = woocommerce_get_product_thumbnail('shop_catalog');
+$image = woocommerce_get_product_thumbnail('shop_single');
+$image = woocommerce_get_product_thumbnail('shop_thumbnail');
+
+
+?>
+
+<!-- Remove image sizes -->
+1/ In function get_intermediate_image_sizes() in wp-includes/media.php
+Set $image_sizes = [];
+2/ function acf_get_image_sizes() in wp-content\plugins\advanced-custom-fields-pro\api\api-helpers.php
+Set $sizes = [];
+3/ Find add_image_size in function.php and remove all.
+4/ Add new image size in function.php
+add_theme_support( 'large', 'product' );
+add_image_size( 'large', 600, 600, true );
+
+
+<!-- Search form -->
+<form role="search" class="form" method="get" id="searchform" action="http://sewclassic.local/">
+    <div class="input-group">
+        <label class="sr-only" for="s">Search for:</label>
+        <input type="search" value="" name="s" id="searchBarInput" placeholder="Search Sew Classic Fabrics">
+        <span class="input-group-btn">
+            <button type="submit" id="searchsubmit" class="btn btn-default"><i class="el-icon-search"></i></button>
+        </span>
+    </div>
+</form>
+
+
+

@@ -1,0 +1,56 @@
+
+
+<!-- Related product -->
+is call in plugin/woocommerce/includes/wc-product-function.php function woocommerce_related_products()
+Default it will get 4 items with random.
+
+<!-- Get tags of product -->
+<?php 
+// Load all tags
+function load_all_tags() {
+    $terms = get_terms( array(
+            'hide_empty' => true,
+            'taxonomy' => 'product_tag'
+        )
+    );
+    echo json_encode($terms);
+    die();
+}
+add_action('wp_ajax_load_all_tags', 'load_all_tags');
+add_action('wp_ajax_nopriv_load_all_tags', 'load_all_tags');
+
+// Get tags in detail page
+$terms = get_the_terms( $product->get_id(), 'product_tag' ); // array tags
+$tags = get_the_term_list($pro_id, 'product_tag', '', ', ' ); // return string with link
+echo strip_tags( $tags ); // remove links, only strings
+
+?>
+
+<?php
+// START FUNCTION.PHP
+
+// remove breadcrumb in detail page 
+remove_action( 'woocommerce_before_main_content','woocommerce_breadcrumb', 20);
+
+// Remove tab content in product detail page
+remove_action( 'woocommerce_after_single_product_summary','woocommerce_output_product_data_tabs', 10 );
+
+// Remove tab content in product detail page
+remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10 );
+
+// Remove sidebar in detail page
+add_action( 'wp', 'remove_sidebar_on_product_pages' ); 
+function remove_sidebar_on_product_pages() {
+    if (is_product()) {
+        remove_action('woocommerce_sidebar','woocommerce_get_sidebar',10);
+    }
+}
+
+
+// change woocommerce_template_single_add_to_cart - from 30 to 70
+remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+add_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 70 );
+
+
+
+?>

@@ -1,9 +1,43 @@
+<!-- Get store emails -->
+<?php
+$this->scopeConfig->getValue(
+    'trans_email/ident_general/email',
+    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+);
+// trans_email/ident_general/email
+// trans_email/ident_sales/email
+// trans_email/ident_support/email 
+// trans_email/ident_custom1/email 
+// trans_email/ident_custom2/email 
+?>
 
-
+<!-- add folder dir custom DirectoryList -->
+<?php // edit file /vendor/magento/framework/App/Filesystem/DirectoryList.php
+const MEDIA_ORDER_PDF = 'order_pdf'; // Samuel Kong
+public static function getDefaultConfig()
+{
+    $result = [
+        // ....
+        self::MEDIA_ORDER_PDF => [parent::PATH => 'pub/media/order_pdf'] // Samuel Kong
+    ];
+    return parent::getDefaultConfig() + $result;
+}
+// use in custom module
+use Magento\Framework\App\Filesystem\DirectoryList;
+DirectoryList::MEDIA_ORDER_PDF;
+?>
 
 
 
 <!-- ======= CATALOG - PRODUCT DETAIL PAGE - CATEGORIES PAGE ======= -->
+
+Magento 2 có 3 loại price:
+Group price: cho phép bạn đặt giá khuyến mãi cho 1 vài nhóm user.
+Special price: đặt giá khuyến mãi trong một khoảng thời gian nào đó.
+Tier price: đặt một khuyến mãi về giá theo qty của sản phẩm cho một nhóm user.
+
+<!-- config product attributes -->
+List product attribute -> in tables: eav_attribute + catalog_eav_attribute
 
 <!-- Remove Please select in option select -->
 /Magento/Catalog/Block/Product/View/Options/Type/Select.php
@@ -12,6 +46,23 @@ if ($_option->getType() == \Magento\Catalog\Model\Product\Option::OPTION_TYPE_DR
     $select->setName('options[' . $_option->getid() . ']');
     //->addOption('', __('-- Please Select --'));
 } 
+?>
+
+<!-- Add image url for category object -->
+
+<?php 
+<preference for="Magento\Catalog\Model\ResourceModel\Category" type="Lexim\CategoryImage\Model\Category" />
+public function getChildrenCategories($category)
+{
+    $collection = $category->getCollection();
+    $collection->addAttributeToSelect(
+    ...
+    )->addAttributeToSelect(
+        'image'
+    )
+    ...
+    return $collection;
+}    
 ?>
 
 <!-- Enable Review -->
@@ -96,8 +147,10 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 $productCollection = $_objectManager->create('Magento\Catalog\Model\ResourceModel\Product\CollectionFactory');
 $collection = $productCollection->create()
     ->addAttributeToSelect('*')
+    ->addAttributeToFilter("entity_id", ["eq" => "20"])
     ->addFieldToFilter("status", "1")
     ->addFieldToFilter("type_id", array('neq' => 'configurable'))
+    ->addAttributeToFilter('visibility', array("neq" => "1"))
     ->setOrder('created_at', 'DESC')
     ->setPageSize(12) // Limit product
     ->load();
@@ -152,9 +205,27 @@ $promo = $promotionCollection->create()
 2. Check id in: catalog_eav_attribute
 
 
+<!-- ========== CONFIG ADMIN ========== -->
+<!-- render view cell column in grid  -->
+/vendor/magento/module-ui/view/base/web/js/grid/columns/actions.js
+/vendor/magento/module-ui/view/base/web/templates/grid/cells/actions.html
 
+
+<!-- Config Email -->
++ List email: General -> Store Email Address
++ Customer -> Customer config -> Create new account options:
+Default Email: smtp.gmail.com
+
+<!-- Config contact email -->
+Store / Config / General / Contact
 
 <!-- ======= ORDER - CART - CHECKOUT ======= -->
+
+<!-- Get Order items by order id -->
+<?php 
+$order = $_objectManager->create('Magento\Sales\Model\Order')->load($orderId);
+$orders = $order->getAllItems();
+?>
 
 <!-- Get custom options of item in order cart -->
 <?php
@@ -194,6 +265,57 @@ public function getGroupedAllShippingRates()
     uasort($rates, [$this, '_sortRates']);
     return $rates;
 }
+?>
+
+<!-- Change order status -->
+Thêm vài dòng code trong module-sales/view/adminhtml/ui_component/sales_order_grid.xml
+<listingToolbar name="listing_top">
+    <massaction name="listing_massaction">
+        <action name="cs_pending">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="type" xsi:type="string">cs_pending</item>
+                    <item name="label" xsi:type="string" translate="true">Order Receive</item>
+                    <item name="url" xsi:type="url" path="sales/order/massOrderStatus">
+                        <param name="status">pending</param>
+                    </item>
+                    <item name="confirm" xsi:type="array">
+                        <item name="title" xsi:type="string" translate="true">Order Receive</item>
+                        <item name="message" xsi:type="string" translate="true">Are you sure you want to change status of selected items?</item>
+                    </item>
+                </item>
+            </argument>
+        </action>
+    </massaction>
+</listingToolbar>
+
+Tạo file MassOrderStatus.php trong module-sales/Controller/Adminhtml/Order (bắt chước MassCancel.php)
+<?php
+protected function massAction(AbstractCollection $collection)
+    {
+        $status = $this->getRequest()->getParam('status');
+
+        $countExecution = 0;
+        foreach ($collection->getItems() as $order) {
+            $order->setStatus($status);
+            $order->save();
+            $countExecution++;
+        }
+
+        $countDefeat = $collection->count() - $countExecution;
+        if ($countDefeat && $countExecution) {
+            $this->messageManager->addError(__('%1 order(s) cannot be changed status.', $countDefeat));
+        } elseif ($countDefeat) {
+            $this->messageManager->addError(__('No order statuses have been changed.'));
+        }
+        if ($countExecution) {
+            $this->messageManager->addSuccess(__('%1 order(s) have been updated status.', $countExecution));
+        }
+
+        $resultRedirect = $this->resultRedirectFactory->create();
+        $resultRedirect->setPath($this->getComponentRefererUrl());
+        return $resultRedirect;
+    }
 ?>
 
 <!-- Create Custom Order Status -->
@@ -256,6 +378,85 @@ Zip: 72601
 Test URL: https://wsbeta.fedex.com:443/web-services
 
 <!-- ======= CUSTOMER - ACCOUNT PAGE ======= -->
+
+<!-- Add custom field for customer -->
+File Setup/InstallData.php in Extension
+<?php
+namespace Ibnab\CustomerPut\Setup;
+use Magento\Framework\Module\Setup\Migration;
+use Magento\Framework\Setup\InstallDataInterface;
+use Magento\Framework\Setup\ModuleContextInterface;
+use Magento\Framework\Setup\ModuleDataSetupInterface;
+
+class InstallData implements InstallDataInterface
+{
+    private $customerSetupFactory;
+
+    public function __construct(\Magento\Customer\Setup\CustomerSetupFactory $customerSetupFactory)
+    {
+        $this->customerSetupFactory = $customerSetupFactory;
+    }
+
+    public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
+    {
+
+        $installer = $setup;
+        $installer->startSetup();
+        $customerSetup = $this->customerSetupFactory->create(['setup' => $setup]);
+
+        $used_in_forms[] = "adminhtml_customer";
+        $used_in_forms[] = "checkout_register";
+        $used_in_forms[] = "customer_account_create";
+        $used_in_forms[] = "customer_account_edit";
+        $used_in_forms[] = "adminhtml_checkout";
+
+        $customerSetup->removeAttribute(\Magento\Customer\Model\Customer::ENTITY, "free_delivery_kong");
+        $customerSetup->addAttribute(\Magento\Customer\Model\Customer::ENTITY, "free_delivery_kong", array(
+            "type" => "varchar",
+            "backend" => "",
+            "label" => "Free Delivery Status: Yes = 1, No = 0",
+            "input" => "text",
+            "source" => "",
+            "visible" => true,
+            "required" => false,
+            "default" => "0",
+            "frontend" => "",
+            "unique" => false,
+            "note" => ""
+
+        ));
+        $installer->endSetup();
+    }
+}
+?>
+
+<!-- Override Controller -->
+In di.xml of extension
+<preference for="Magento\Customer\Controller\Account\CreatePost" type="Lexim\Override\Controller\Account\CreatePost" />
+Call public function __construct() in CreatePost extensuon extend from CreatePost core
+
+<!-- Controller -->
+In Magento 2 URL’s are constructed this way:
+<frontName>/<controler_folder_name>/<controller_class_name>
+
+<!-- Upload file in post controller -->
+<?php
+use Magento\Framework\File\UploaderFactory;
+use Magento\Framework\Filesystem;
+
+$uploader = $this->fileUploaderFactory->create(['fileId' => 'seller_file']); // seller_file is name of input file
+$uploader->setAllowedExtensions(['jpg', 'jpeg', 'pdf', 'png']);
+$uploader->setAllowRenameFiles(true);
+$uploader->setFilesDispersion(false);
+$uploader->setAllowCreateFolders(true);
+
+$path = $this->fileSystem->getDirectoryRead(DirectoryList::MEDIA)
+->getAbsolutePath('images/certificate/');
+
+$result = $uploader->save($path);
+if ($result) $customer->setCustomAttribute('seller_permit', $this->_url->getBaseUrl() . 'pub/media/images/certificate/' .  $result['file']);
+?>
+
 
 <!-- Add custom Attribute Customer -->
 etc/module.xml
@@ -366,8 +567,8 @@ http://blog.belvg.com/newsletters-in-magento-2-0.html
 
 
 <!-- Magento: Join, filter, select and sort attributes, fields and tables  -->
-<!-- http://blog.chapagain.com.np/magento-join-filter-select-and-sort-attributes-fields-and-tables/ -->
-addAttributeToFilter: adds WHERE clause on $attribute specified by $condition
+http://blog.chapagain.com.np/magento-join-filter-select-and-sort-attributes-fields-and-tables/
+
 
 <?php
 /**
@@ -375,46 +576,28 @@ addAttributeToFilter: adds WHERE clause on $attribute specified by $condition
 *
 * If $attribute is an array will add OR condition with following format:
 * array(
-* array(‘attribute’=>’firstname’, ‘like’=>’test%’),
-* array(‘attribute’=>’lastname’, ‘like’=>’test%’),
+    array('attribute'=>'firstname', 'like'=>'test%'),
+     array('attribute'=>'lastname', 'like'=>'test%'),
 * )
 *
-* @see self::_getConditionSql for $condition
-* @param Mage_Eav_Model_Entity_Attribute_Interface|integer|string|array $attribute
-* @param null|string|array $condition
-* @param string $operator
-* @return Mage_Eav_Model_Entity_Collection_Abstract
 */
-addAttributeToFilter($attribute, $condition=null, $joinType=’inner’)
-addAttributeToSelect: gets the value for $attribute in the SELECT clause; specify * to get all attributes (i.e. to execute SELECT *)
+addAttributeToFilter($attribute, $condition=null, $joinType='inner');
 
-/**
-* Add attribute to entities in collection
-*
-* If $attribute==’*’ select all attributes
-*
-* @param array|string|integer|Mage_Core_Model_Config_Element $attribute
-* @param false|string $joinType flag for joining attribute
-* @return Mage_Eav_Model_Entity_Collection_Abstract
-*/
-addAttributeToSelect($attribute, $joinType=false)
+// addAttributeToSelect: gets the value for $attribute in the SELECT clause; specify * to get all attributes (i.e. to execute SELECT *)
+addAttributeToSelect($attribute, $joinType=false);
 
 /* If an array is passed but no attribute code specified, it will be interpreted as a group of OR conditions that will be processed in the same way.
 If no attribute code is specified, it defaults to eq.*/
 
 $collection = Mage::getModel('catalog/product')->getCollection();
-// select all attributes
 $collection->addAttributeToSelect('*');
-// select specific attributes
 $collection->addAttributeToSelect(array('name', 'url_key', 'type_id'));
-// select only those items whose status = 1
 $collection->addAttributeToFilter('status', 1);
 // alternative to select only those items whose status = 1
 $collection->addAttributeToFilter('status', array('eq' => 1));
 // using LIKE statement
 $collection->addAttributeToFilter('sku', array('like' => '%CH%'));
-// using IN statement,
-// i.e. selecting only those items whose ID fall in the given array
+// using IN statement
 $collection->addAttributeToFilter('id', array('in' => array(1, 14, 51, 52)));
 // selecting only those items whose ID is greater than the given value
 $collection->addAttributeToFilter('id', array('gt' => 5));
@@ -423,54 +606,18 @@ $collection->addAttributeToFilter('date_field', array(
     'from' => '10 September 2010',
     'to' => '21 September 2010',
     'date' => true, // specifies conversion of comparison values
-    ));
+));
 // Add OR condition:
 $collection->addAttributeToFilter(array(
     array(
         'attribute' => 'field_name',
         'in'        => array(1, 2, 3),
-        ),
+    ),
     array(
         'attribute' => 'date_field',
         'from'      => '2010-09-10',
-        ),
-    ));
-$collection = Mage::getModel('catalog/product')->getCollection(); 
-// select all attributes
-$collection->addAttributeToSelect('*'); 
-// select specific attributes
-$collection->addAttributeToSelect(array('name', 'url_key', 'type_id')); 
-// select only those items whose status = 1
-$collection->addAttributeToFilter('status', 1); 
-// alternative to select only those items whose status = 1
-$collection->addAttributeToFilter('status', array('eq' => 1)); 
-// using LIKE statement
-$collection->addAttributeToFilter('sku', array('like' => '%CH%')); 
-// using IN statement,
-// i.e. selecting only those items whose ID fall in the given array
-$collection->addAttributeToFilter('id', array('in' => array(1, 14, 51, 52)));
- 
-// selecting only those items whose ID is greater than the given value
-$collection->addAttributeToFilter('id', array('gt' => 5));
- 
-// select by date range
-$collection->addAttributeToFilter('date_field', array(
-    'from' => '10 September 2010',
-    'to' => '21 September 2010',
-    'date' => true, // specifies conversion of comparison values
-    ));
- 
-// Add OR condition:
-$collection->addAttributeToFilter(array(
-    array(
-        'attribute' => 'field_name',
-        'in'        => array(1, 2, 3),
-        ),
-    array(
-        'attribute' => 'date_field',
-        'from'      => '2010-09-10',
-        ),
-    ));
+    )
+));
 
 /**
 Below is the full filter condition codes with attribute code and its sql equivalent
@@ -493,22 +640,42 @@ to  :   <=  (for use with dates) date : optional flag for use with from/to to sp
 /**
 * addFieldToFilter: alias for addAttributeToFilter(). This filters the database table fields.
 * Wrapper for compatibility with Varien_Data_Collection_Db
-*
-* @param mixed $attribute
-* @param mixed $condition
 */
 addFieldToFilter($attribute, $condition=null)
 
-addAttributeToSort: adds ORDER BY clause on $attribute
+
+// addAttributeToSort: adds ORDER BY clause on $attribute
+addAttributeToSort($attribute, $dir='asc')
 
 /**
-* Add attribute to sort order
+* groupByAttribute: adds $attribute to GROUP BY clause
+* Groups results by specified attribute
 *
-* @param string $attribute
+* @param string|array $attribute
+*/
+groupByAttribute($attribute)
+
+/**
+setPage: sets LIMIT clause by specifying page number (one-indexed) and number of records per page; equivalent to calling setCurPage($pageNum) and setPageSize($pageSize)
+* Set collection page start and records to show
+*
+* @param integer $pageNum
+* @param integer $pageSize
+* @return Mage_Eav_Model_Entity_Collection_Abstract
+*/
+setPage($pageNum, $pageSize)
+
+/**
+setOrder: alias for addAttributeToSort() q.v., identical except that it can accept array of attributes, and default $dir is desc
+* Set sorting order
+*
+* $attribute can also be an array of attributes
+*
+* @param string|array $attribute
 * @param string $dir
 * @return Mage_Eav_Model_Entity_Collection_Abstract
 */
-addAttributeToSort($attribute, $dir=’asc’)
+setOrder($attribute, $dir='desc')
 
 
 /**
@@ -527,15 +694,6 @@ addAttributeToSort($attribute, $dir=’asc’)
 * @return Mage_Eav_Model_Entity_Collection_Abstract
 */
 addExpressionAttributeToSelect($alias, $expression, $attribute)
-
-
-/**
-* groupByAttribute: adds $attribute to GROUP BY clause
-* Groups results by specified attribute
-*
-* @param string|array $attribute
-*/
-groupByAttribute($attribute)
 
 /**
 * 
@@ -590,30 +748,30 @@ $joinType = join type
 */
 joinTable($table, $bind, $fields=null, $cond=null, $joinType=’inner’)
 
+/**
 Using joinAttribute and joinTable
 In the code below, all order invoice items are selected, i.e. all products that have been invoiced.
 joinTable is used to join sales_order_entity table to fetch increment_id and store_id of the invoice for each product.
 joinAttribute is used to fetch order_id, product_name, and store_id.
 joinTable is used again to fetch the order status of each invoice item.
+*/
+$collection = Mage::getModel('sales/order_invoice_item')
+->getCollection()
+->joinTable('sales_order_entity', 'entity_id=parent_id', array('invoice_id'=>'increment_id', 'store_id' => 'store_id'), null , 'left')
+->joinAttribute('order_id', 'invoice/order_id', 'parent_id', null, 'left')
+->joinAttribute('product_name', 'invoice_item/name', 'entity_id', null, 'left')
+->joinAttribute('store_id', 'invoice/store_id', 'parent_id', null, 'left')
+->joinTable('sales_order', 'entity_id=order_id', array('order_status'=>'status'), null , 'left')
+;
 
 $collection = Mage::getModel('sales/order_invoice_item')
-    ->getCollection()
-    ->joinTable('sales_order_entity', 'entity_id=parent_id', array('invoice_id'=>'increment_id', 'store_id' => 'store_id'), null , 'left')
-    ->joinAttribute('order_id', 'invoice/order_id', 'parent_id', null, 'left')
-    ->joinAttribute('product_name', 'invoice_item/name', 'entity_id', null, 'left')
-    ->joinAttribute('store_id', 'invoice/store_id', 'parent_id', null, 'left')
-    ->joinTable('sales_order', 'entity_id=order_id', array('order_status'=>'status'), null , 'left')
-    ;
-
-$collection = Mage::getModel('sales/order_invoice_item')
-    ->getCollection()
-    ->joinTable('sales_order_entity', 'entity_id=parent_id', array('invoice_id'=>'increment_id', 'store_id' => 'store_id'), null , 'left')
-    ->joinAttribute('order_id', 'invoice/order_id', 'parent_id', null, 'left')
-    ->joinAttribute('product_name', 'invoice_item/name', 'entity_id', null, 'left')
-    ->joinAttribute('store_id', 'invoice/store_id', 'parent_id', null, 'left')
-    ->joinTable('sales_order', 'entity_id=order_id', array('order_status'=>'status'), null , 'left')
-    ;
-
+->getCollection()
+->joinTable('sales_order_entity', 'entity_id=parent_id', array('invoice_id'=>'increment_id', 'store_id' => 'store_id'), null , 'left')
+->joinAttribute('order_id', 'invoice/order_id', 'parent_id', null, 'left')
+->joinAttribute('product_name', 'invoice_item/name', 'entity_id', null, 'left')
+->joinAttribute('store_id', 'invoice/store_id', 'parent_id', null, 'left')
+->joinTable('sales_order', 'entity_id=order_id', array('order_status'=>'status'), null , 'left')
+;
 
 
 /**
@@ -643,16 +801,6 @@ removeAttributeToSelect: removes $attribute from SELECT clause; specify null to 
 removeAttributeToSelect($attribute=null)
 
 /**
-setPage: sets LIMIT clause by specifying page number (one-indexed) and number of records per page; equivalent to calling setCurPage($pageNum) and setPageSize($pageSize)
-* Set collection page start and records to show
-*
-* @param integer $pageNum
-* @param integer $pageSize
-* @return Mage_Eav_Model_Entity_Collection_Abstract
-*/
-setPage($pageNum, $pageSize)
-
-/**
 importFromArray: imports 2D array into collection as objects
 * Import 2D array into collection as objects
 *
@@ -664,31 +812,98 @@ importFromArray: imports 2D array into collection as objects
 importFromArray($arr)
 
 
-
 /**
 exportToArray: returns collection data as a 2D array
 * Get collection data as a 2D array
-*
 * @return array
 */
 exportToArray()
-
-
-/**
-setOrder: alias for addAttributeToSort() q.v., identical except that it can accept array of attributes, and default $dir is desc
-* Set sorting order
-*
-* $attribute can also be an array of attributes
-*
-* @param string|array $attribute
-* @param string $dir
-* @return Mage_Eav_Model_Entity_Collection_Abstract
-*/
-setOrder($attribute, $dir=’desc’)
-
 ?>
 
+
+<!-- API Instagram API -->
+0. Create a new app
+https://www.instagram.com/developer/clients/manage/
+CLIENT INFO SIVA
+CLIENT ID   98164b1728f148c0ae005e3493cd2a2b
+CLIENT SECRET   793acb2a607b4ff19788a55dfa218406
+WEBSITE URL http://siva.vn
+REDIRECT URI    http://siva.vn
+SUPPORT EMAIL   letunhatkong@gmail.com
+letunhatkong: 3309870573
+access_token siva.vn: 3309870573.98164b1.d872979b5c61476ea4994fcd5d316ea5
+
+1. Find User id
+http://www.otzberg.net/iguserid/index.php
+
+2. Get code 
+https://api.instagram.com/oauth/authorize/?client_id=CLIENT-ID&redirect_uri=REDIRECT-URI&response_type=code
+
+3. Get access_token
+type in linux cmd:
+curl -F 'client_id=98164b1728f148c0ae005e3493cd2a2b' \
+-F 'client_secret=793acb2a607b4ff19788a55dfa218406' \
+-F 'grant_type=authorization_code' \
+-F 'redirect_uri=http://52.39.199.186/' \
+-F 'code=5c2f8f00733648a084382579902f5b20' \
+https://api.instagram.com/oauth/access_token
+
+
+http://52.39.199.186/?code=5c2f8f00733648a084382579902f5b20
+http://siva.vn/?code=9dcf2108c3ac43129f4029bcc9696d39
+
+object(stdClass)#1122 (15) { 
+    ["attribution"]=> NULL 
+    ["tags"]=> array(0) { } 
+    ["type"]=> string(5) "image" 
+    ["location"]=> NULL 
+    ["comments"]=> object(stdClass)#1247 (1) { ["count"]=> int(0) } 
+    ["filter"]=> string(6) "Normal" 
+    ["created_time"]=> string(10) "1465980278" 
+    ["link"]=> string(40) "https://www.instagram.com/p/BGqzuBLCPta/" 
+    ["likes"]=> object(stdClass)#1166 (1) { ["count"]=> int(0) } 
+    ["images"]=> object(stdClass)#1108 (3) { 
+        ["low_resolution"]=> object(stdClass)#1147 (3) { 
+            ["url"]=> string(151) "https://scontent.cdninstagram.com/t51.2885-15/s320x320/e35/13392647_1579044049062434_1611277269_n.jpg?ig_cache_key=MTI3MzA1NzMwNzQxMjQ2MjQyNg%3D%3D.2.l" 
+            ["width"]=> int(320) 
+            ["height"]=> int(320) 
+        } 
+        ["thumbnail"]=> object(stdClass)#1219 (3) { 
+            ["url"]=> string(163) "https://scontent.cdninstagram.com/t51.2885-15/s150x150/e35/c0.95.768.768/13385621_148838945521951_483117555_n.jpg?ig_cache_key=MTI3MzA1NzMwNzQxMjQ2MjQyNg%3D%3D.2.c" 
+            ["width"]=> int(150) 
+            ["height"]=> int(150) 
+        } 
+        ["standard_resolution"]=> object(stdClass)#1126 (3) { 
+            ["url"]=> string(158) "https://scontent.cdninstagram.com/t51.2885-15/s640x640/sh0.08/e35/13392647_1579044049062434_1611277269_n.jpg?ig_cache_key=MTI3MzA1NzMwNzQxMjQ2MjQyNg%3D%3D.2.l" 
+            ["width"]=> int(640) 
+            ["height"]=> int(640) 
+        } 
+    } 
+    ["users_in_photo"]=> array(0) { } 
+    ["caption"]=> object(stdClass)#1114 (4) { 
+        ["created_time"]=> string(10) "1465980278" 
+        ["text"]=> string(9) "White LOL" 
+        ["from"]=> object(stdClass)#1135 (4) { 
+            ["username"]=> string(12) "letunhatkong" 
+            ["profile_picture"]=> string(116) "https://igcdn-photos-f-a.akamaihd.net/hphotos-ak-xat1/t51.2885-19/s150x150/13408825_850610411711365_1887981232_a.jpg" 
+            ["id"]=> string(10) "3309870573" 
+            ["full_name"]=> string(11) "Samuel Kong" 
+        } 
+        ["id"]=> string(17) "17857743217007909" 
+    } 
+    ["user_has_liked"]=> bool(false) 
+    ["id"]=> string(30) "1273057307412462426_3309870573" 
+    ["user"]=> object(stdClass)#1192 (4) { 
+        ["username"]=> string(12) "letunhatkong" 
+        ["profile_picture"]=> string(116) "https://igcdn-photos-f-a.akamaihd.net/hphotos-ak-xat1/t51.2885-19/s150x150/13408825_850610411711365_1887981232_a.jpg" ["id"]=> string(10) "3309870573" 
+        ["full_name"]=> string(11) "Samuel Kong" 
+    } 
+}
+
+
 <!-- EVENT OBSERVER -->
+search eventManager->dispatch( in module of vendor
+<p
 File    Event name
 app/code/Magento/Authorizenet/Controller/Directpost/Payment/Place.php   checkout_directpost_placeOrder
 app/code/Magento/Backend/Block/System/Store/Edit/AbstractForm.php   adminhtml_store_edit_form_prepare_form
@@ -1065,3 +1280,7 @@ lib/web/mage/adminhtml/wysiwyg/tiny_mce/setup.js    tinymceChange
 lib/web/mage/adminhtml/wysiwyg/tiny_mce/setup.js    tinymceExecCommand
 lib/web/mage/adminhtml/wysiwyg/tiny_mce/setup.js    open_browser_callback
 lib/web/mage/adminhtml/wysiwyg/widget.js    tinymceChange
+
+>
+
+

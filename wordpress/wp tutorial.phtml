@@ -1,0 +1,90 @@
+<!-- INSTALL -->
+1/ INSTALL PHP, APACHE2, MySQL
+==== PHP
+# sudo apt-get -y update
+# sudo add-apt-repository ppa:ondrej/php5-5.6
+# sudo apt-get -y update
+# sudo apt-get -y install php5 php5-common php5-mcrypt php5-curl php5-cli php5-mysql php5-gd php5-intl php5-xsl libapache2-mod-php5 libcurl3 libssh2-php
+# sudo apt-get install mysql-server-5.6 php5-mysql 
+
+
+==== Config Apache2
+# sudo apt-get install apache2
+# sudo nano /etc/apache2/site-avalaible/siva.conf
+<VirtualHost siva.vn:80>
+    ServerAdmin siva@localhost
+    DocumentRoot /var/www/html/siva
+    ServerName siva.vn
+
+    <Directory /var/www/html/siva>
+        Allow from all
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride All
+        Order allow,deny
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/siva-log.log
+    CustomLog ${APACHE_LOG_DIR}/siva-access.log combined
+
+</VirtualHost>
+# sudo nano /etc/hosts
+127.0.1.1 siva.vn
+
+<!-- Create virtulhost in xampp -->
+NameVirtualHost *:80
+<VirtualHost kong.local:80>
+    ServerAdmin kong.local
+    DirectoryIndex index.php
+    DocumentRoot "C:\xampp\htdocs\test" 
+    ServerName kong.local
+    ErrorLog "logs/test.com-error.log"
+    CustomLog "logs/test.com-access.log" common 
+    <Directory "C:\wamp\www\mentor">
+        Options Indexes FollowSymlinks 
+        AllowOverride all
+        Order Allow,Deny
+        Allow from all
+    </Directory>
+</VirtualHost>
+
+==== MySQL
+
+CREATE DATABASE gg; CREATE USER gg@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON gg.* TO gg@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
+exit;
+
+CREATE DATABASE test; GRANT ALL PRIVILEGES ON test.* TO test@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
+CREATE DATABASE sewclassic; GRANT ALL PRIVILEGES ON sewclassic.* TO sewclassic@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
+
+
+2/ Download WORDPRESS
+Copy WP to /var/www/html/siva
+Copy wp-config-sample.php to wp-config.php
+cd sewclassic
+
+
+3. PERMISSON 
+sudo chown -R seadev:www-data
+sudo find . -type d -exec chmod 755 {} \;
+sudo find . -type f -exec chmod 644 {} \;
+sudo chmod -R 777 wp-content/uploads/
+
+
+<!-- End INSTALL -->
+
+<!-- Optimize speed page -->
+admin -> setting -> disscuon
+Allow link notifications from other blogs (pingbacks and trackbacks) on new articles 
+
+<!-- WP Super Cache - config -->
+Tick list:
+Cache hits to this website for quick access. (Recommended)
+Use mod_rewrite to serve cache files. (Recommended)
+Compress pages so they’re served more quickly to visitors. (Recommended)
+Don’t cache pages for known users. (Recommended)
+Only refresh current page when comments made.
+
+Đánh dấu xong, hãy ấn vào nút Update Status để hoàn tất.
+Sau đó bạn kéo xuống, tìm nút Update Mod_Rewrite Rules rồi ấn vào để nó tự thêm nội dung file .htaccess 
+Nếu nó hiện ra bảng màu xanh lá cây thì bạn đã làm thành công.
+
+

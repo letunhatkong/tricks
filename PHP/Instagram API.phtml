@@ -3,6 +3,7 @@
 
 0. Create a new app
 https://www.instagram.com/developer/clients/manage/
+
 CLIENT INFO SIVA
 CLIENT ID	98164b1728f148c0ae005e3493cd2a2b
 CLIENT SECRET	793acb2a607b4ff19788a55dfa218406
@@ -12,6 +13,34 @@ SUPPORT EMAIL	letunhatkong@gmail.com
 letunhatkong: 3309870573
 access_token siva.vn: 3309870573.98164b1.d872979b5c61476ea4994fcd5d316ea5
 
+
+Access Token: 5633655524.3a81a9f.17e99bca8303472ab99b8f7b1b352714
+User ID: 5633655524
+Full name: Lê Tự Nhật Kông
+Username: @nhatkong
+
+
+SewClassic App
+CLIENT ID	9bc39c8da5ad4d2bbb78419d798f2dcd
+SUPPORT EMAIL	letunhatkong@gmail.com
+CLIENT STATUS	Sandbox Mode
+http://sewclassic.local
+The "Author Name" is: sewclassicfabrics
+The "SewClassic User ID" is: 3877384342
+code=27e4e2d38a1745fdb11634fb2c432a5f
+access_token: 5633655524.9bc39c8.839efdc081c4464cb2eb780e03b7b967
+
+                                                          
+
+type in linux cmd:
+curl -F 'client_id=9bc39c8da5ad4d2bbb78419d798f2dcd' \
+-F 'client_secret=6bcd14491f2840d9ba9ae925d649cdd6' \
+-F 'grant_type=authorization_code' \
+-F 'redirect_uri=http://sewclassic.local' \
+-F 'code=27e4e2d38a1745fdb11634fb2c432a5f' \
+https://api.instagram.com/oauth/access_token
+
+https://api.instagram.com/oauth/authorize/?client_id=9bc39c8da5ad4d2bbb78419d798f2dcd&redirect_uri=http://sewclassic.local&response_type=code
 
 1. Find User id
 http://www.otzberg.net/iguserid/index.php
@@ -28,9 +57,6 @@ curl -F 'client_id=98164b1728f148c0ae005e3493cd2a2b' \
 -F 'code=5c2f8f00733648a084382579902f5b20' \
 https://api.instagram.com/oauth/access_token
 
-
-http://52.39.199.186/?code=5c2f8f00733648a084382579902f5b20
-http://siva.vn/?code=9dcf2108c3ac43129f4029bcc9696d39
 
 4. Get data
 <?php
@@ -52,6 +78,13 @@ foreach ($result->data as $post) {
    break;
 }
 ?>
+
+
+<!-- Get your access token -->
+https://smashballoon.com/instagram-feed/token/
+<!-- Get user id that you want to get feeds -->
+https://smashballoon.com/instagram-feed/find-instagram-user-id/
+<!-- And go to 4 Get Data -->
 
 object(stdClass)#1122 (15) { 
 	["attribution"]=> NULL 

@@ -1,0 +1,14 @@
+<!-- Fix bug đã cài VMware Tools mà bị hư ko chạy được. -->
+<!-- Nếu ko có VMware Tools thì ko thể copy, paste cũng như auto scale screen -->
+If the bundled VMware Tools is installed, perform the following steps:
+Edit the /etc/vmware-tools/vmware-user.desktop file as root by changing this line:
+Exec=/usr/bin/vmware-user
+To this line:
+Exec=env VMWARE_USE_SHIPPED_LIBS=1 /usr/bin/vmware-user
+Log out of the guest and log in again.
+This change can prevent the VMware Tools service vmtoolsd from failure
+To verify that the preceding steps are effective, issue the following command:
+'ps -aux | grep vmtools'
+The appropriate command return shows both of the following vmtoolsd services running:
+-/usr/sbin/vmtoolsd
+-/usr/lib/vmware-tools/sbin64/vmtoolsd
