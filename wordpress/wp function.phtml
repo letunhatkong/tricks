@@ -58,6 +58,17 @@ function admin_style() {
 add_action('admin_enqueue_scripts', 'admin_style');
 
 
+/**
+ * Remove p and <br> in contact form 7
+ * in fucntion.php
+ */
+define('WPCF7_AUTOP', false );
+// or add in function php
+remove_filter( 'the_content', 'wpautop' );
+remove_filter( 'the_excerpt', 'wpautop' )
+
+
+
 // END FUNCTION.PHP
 ?>
 
@@ -86,7 +97,8 @@ $args = array(
     'posts_per_page' => -1,
     'meta_query' => $meta_query,
     'orderby' => 'date', // date is primary, title
-	'order'  => 'ASC' // default is DESC
+	'order'  => 'ASC', // default is DESC
+    'post__not_in' => array(696) // except by id array
 );
 
 // order by featured product
@@ -174,6 +186,7 @@ $args = array(
     'post_type'   =>  'product',
     'status' => 'publish',
     'orderby'     =>  'date',
+    's' => "title of product",  // search
     'order'       =>  'DESC',
     'posts_per_page' => 10,
     'tax_query'      => $tax_query
@@ -230,6 +243,26 @@ while ($query->have_posts()) {
 
 ?>
 
+<!-- Member Variables of WP_Post V3.5.1 -->
+Member          Type    Notes
+ID              int     The ID of the post
+post_author     string  The post author's user ID (numeric string)
+post_name       string  The post's slug
+post_type       string  See Post Types
+post_title      string  The title of the post
+post_date       string  Format: 0000-00-00 00:00:00
+post_date_gmt   string  Format: 0000-00-00 00:00:00
+post_content    string  The full content of the post
+post_excerpt    string  User-defined post excerpt
+post_status     string  See get_post_status for values
+comment_status  string  Returns: { open, closed }
+ping_status     string  Returns: { open, closed }
+post_password   string  Returns empty string if no password
+post_parent     int     Parent Post ID (default 0)
+post_modified   string  Format: 0000-00-00 00:00:00
+post_modified_gmt   string  Format: 0000-00-00 00:00:00
+comment_count   string  Number of comments on post (numeric string)
+menu_order      string  Order value as set through page-attribute when enabled (numeric string. Defaults to 0)
 
 <!-- Product -->
 \wp-content\plugins\woocommerce\includes\abstracts\abstract-wc-product.php

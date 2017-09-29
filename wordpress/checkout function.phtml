@@ -1,6 +1,12 @@
 
 <!-- CHECK OUT PAGE -->
 
+<!-- Get order -->
+$order = wc_get_order( $order_id );
+
+<!-- Update order item meta value -->
+wc_update_order_item_meta( $item_id, $meta_key, $meta_value, $prev_value );
+
 <!-- Disable ajax reload page -->
 Rename class form "checkout" to "checkout1" in woocommerce/checkout/form-checkout.php
 
@@ -101,6 +107,138 @@ add_action('woocommerce_checkout_update_order_meta', 'save_custom_checkout_field
  *  Remove payment gateway
  */
 add_filter('woocommerce_cart_needs_payment', '__return_false');
+
+
+// Get data item in order
+$order_items = $order->get_items();
+foreach ($order_items as $key => $value) {
+    echo json_encode($value["name"]) . "<br>";
+    echo json_encode($value["order_id"]) . "<br>";
+    echo json_encode($value["quantity"]) . "<br>";
+    echo json_encode($value["product_id"]) . "<br>";
+    echo json_encode($value["subtotal"]) . "<br>";
+    echo json_encode($value["total"]) . "<br>";
+}
+
+
+// Gift cards
+
+function create_coupon( $coupon_code, $price ) {
+    $check = checkCouponExists( $coupon_code );
+    if ( $check ) {
+        $current = get_post_meta( $check, "coupon_amount" );
+        if ( is_array( $current ) ) {
+            $current = reset( $current );
+        }
+        $amount = floatval( $price + $current );
+        $amount = round( $amount * 100 ) / 100;
+        update_post_meta( $check, 'coupon_amount', $amount );
+    } else {
+        $amount        = $price;
+        $discount_type = 'fixed_cart'; // Type: fixed_cart, percent, fixed_product, percent_product
+        $coupon        = array(
+            'post_title'   => $coupon_code,
+            'post_content' => '',
+            'post_status'  => 'publish',
+            'post_author'  => 1,
+            'post_type'    => 'shop_coupon'
+        );
+
+        $new_coupon_id = wp_insert_post( $coupon );
+
+        // Expiry date
+        $d           = date( "-m-d", time() );
+        $y           = date( "Y", time() );
+        $expiry_date = ( $y + 1 ) . $d;
+
+        // Add meta
+        update_post_meta( $new_coupon_id, 'discount_type', $discount_type );
+        update_post_meta( $new_coupon_id, 'coupon_amount', $amount );
+        update_post_meta( $new_coupon_id, 'individual_use', 'no' );
+        update_post_meta( $new_coupon_id, 'product_ids', '' );
+        update_post_meta( $new_coupon_id, 'exclude_product_ids', '' );
+        update_post_meta( $new_coupon_id, 'usage_limit', '' );
+        update_post_meta( $new_coupon_id, 'expiry_date', $expiry_date );
+        update_post_meta( $new_coupon_id, 'apply_before_tax', 'yes' );
+        update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
+    }
+}
+
+add_action( "woocommerce_checkout_update_order_meta", "after_click_place_order" );
+function after_click_place_order( $order_id ) {
+    $order = wc_get_order( $order_id );
+    // Decrease coupon value
+    $discount = $order->get_discount_total();
+    $discount = ( round( floatval( $discount ) * 100 ) / 100 );
+    $coupons  = $order->get_used_coupons();
+    $count    = count( $coupons );
+    if ( $count === 1 ) {
+        $coupon = reset( $coupons );
+        coupon_decrease_val( $coupon, $discount );
+    } else if ( $count > 0 ) {
+        $cur = 0;
+        foreach ( $coupons as $coupon ) {
+            if ( $cur >= 0 ) {
+                $discount = $discount - $cur;
+            }
+            $cur = coupon_decrease_val( $coupon, $discount );
+        }
+    }
+
+    // Create gift card
+    $couponProductId = 696; // 696
+    $order_items     = $order->get_items();
+    foreach ( $order_items as $key => $value ) {
+        if ( $value["product_id"] === $couponProductId ) {
+            $time       = time();
+            $orderKey   = $order->order_key . ":" . $time;
+            $couponCode = substr( md5( $orderKey ), 0, 12 );
+            $price      = $value["subtotal"];
+            create_coupon( $couponCode, $price );
+            wc_update_order_item_meta( $key, "Coupon", $couponCode );
+        }
+    }
+}
+
+function coupon_decrease_val( $code, $price ) {
+    $id = checkCouponExists( $code );
+    if ( $id ) {
+        $current = get_post_meta( $id, "coupon_amount" );
+        if ( is_array( $current ) ) {
+            $current = reset( $current );
+        }
+        $current = round( floatval( $current ) * 100 ) / 100;
+        $price   = round( floatval( $price ) * 100 ) / 100;
+        $price   = $current - $price;
+        $price   = ( $price <= 0 ) ? 0 : $price;
+        update_post_meta( $id, 'coupon_amount', $price );
+
+        return $current;
+    }
+
+    return - 1;
+}
+
+
+function checkCouponExists( $code ) {
+    $exist = false;
+    $args  = array(
+        'post_type'  => 'shop_coupon',
+        'status'     => 'publish',
+        'post_title' => $code,
+    );
+    $loop  = new WP_Query( $args );
+    foreach ( $loop->posts as $post ) {
+        if ( $code === $post->post_title ) {
+            $exist = $post->ID;
+            break;
+        }
+    }
+
+    return $exist;
+}
+
+// # Gift cards
 
 // END FUNCTION.PHP
 ?>

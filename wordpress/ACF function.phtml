@@ -70,4 +70,8 @@ foreach ($fields_group as $field) {
 $field = get_field_object('field_592fe43b7ae30');
 $categories = $field['choices'];
 
+
+// Get field from post 
+get_field('variable_field', $post->ID);
+
 ?>

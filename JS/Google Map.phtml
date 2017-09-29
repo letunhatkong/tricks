@@ -1,0 +1,245 @@
+<!-- init google map without jQuery -->
+<script type="text/javascript">
+function init_map(){
+    var myOptions = {
+        zoom:16,
+        center:new google.maps.LatLng(34.061563, -118.300718),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
+    marker = new google.maps.Marker({
+        map: map,
+        position: new google.maps.LatLng(34.061563, -118.300718)
+    });
+    infowindow = new google.maps.InfoWindow({
+        content:"<b>Tee &amp; Choi</b><br />123 sss dd,<br/> Ste. 321, <br/> Los Angeles, CA 123321"
+    });
+    google.maps.event.addListener(marker, "click", function(){
+        infowindow.open(map,marker);
+    });
+    infowindow.open(map,marker);
+}
+google.maps.event.addDomListener(window, 'load', init_map);
+</script>
+
+
+
+
+
+
+<!-- Use object -->
+<div id="map" style="width: 100%; height: 700px"></div>
+<div id="change">Click to change</div>
+
+<script type="text/javascript">
+    'use strict';
+
+    var dealerLocator = {
+        mileToKm: 1.609344,
+        map: null,
+        markers: [],
+        locations: null,
+        pointList: null,
+        bounds: null,
+        myLocation: null,
+        geoCoder: null,
+        markerIcon: "/wp-content/themes/shoestrap-3-child/assets/img/dealer-red-pointer.png",
+
+        init: function () {
+            var c = [
+                ['1', 38.246065, -76.9635987],
+                ['2', 38.031497, -78.4831012],
+                ['3', 37.254444, -79.958222],
+                ['mid', 37.6966125, -78.840785975]
+            ];
+            this.setLocations(c);
+            this.setPointList(c);
+            this.geoCoder = new google.maps.Geocoder();
+            this.initMap();
+        },
+
+        initMap: function () {
+            //var point = this.findCenterPoint();
+            this.map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 7,
+                //center: new google.maps.LatLng(point[0], point[1]),
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+            this.registerMaker();
+        },
+
+        registerMaker: function () {
+            var infoWindow = new google.maps.InfoWindow();
+            var marker, i;
+            if (this.locations) {
+                this.bounds = new google.maps.LatLngBounds();
+                for (i = 0; i < this.locations.length; i++) {
+                    marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(this.locations[i][1], this.locations[i][2]),
+                        map: this.map,
+                        title: "",
+                        icon: this.markerIcon
+                    });
+
+                    google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                        return function () {
+                            infoWindow.setContent(dealerLocator.locations[i][0]);
+                            infoWindow.open(dealerLocator.map, marker);
+                        }
+                    })(marker, i));
+                    this.markers.push(marker);
+                    this.bounds.extend(marker.getPosition());
+                }
+                // Set center
+                // var point = this.findCenterPoint();
+                // this.map.setCenter(new google.maps.LatLng(point[0], point[1]));
+
+                // Fit bounds
+                this.map.fitBounds(this.bounds);
+            }
+        },
+
+        clearMarkers: function () {
+            for (var i = 0; i < this.markers.length; i++) {
+                this.markers[i].setMap(null);
+            }
+            // Reset the markers array
+            this.markers = [];
+        },
+
+        setLocations: function (list) {
+            if (!$.isArray(list)) {
+                return false;
+            }
+            this.locations = list;
+            return true;
+        },
+
+        setPointList: function (list) {
+            var pointList = [];
+            if (!$.isArray(list)) {
+                return false;
+            }
+            for (var i = 0; i < list.length; i++) {
+                pointList.push([list[i][1], list[i][2]]);
+            }
+            this.pointList = pointList;
+            return true;
+        },
+
+        findLatLng: function (address) {
+            address = address || 'Virginia, United States';
+            if (!this.geoCoder) {
+                this.geoCoder = new google.maps.Geocoder();
+            }
+            this.geoCoder.geocode({
+                'address': address
+            }, function (results, status) {
+                if (status === google.maps.GeocoderStatus.OK) {
+                    var a = results[0];
+                    console.log(a.geometry.location.lat());
+                    console.log(a.geometry.location.lng());
+                }
+            });
+
+        },
+
+        findMidPoint: function (x0, y0, x1, y1) {
+            var midX = x0 + (x1 - x0) * 0.50;
+            var midY = y0 + (y1 - y0) * 0.50;
+            return [midX, midY];
+        },
+
+        calcTwoPoint: function (xA, yA, xB, yB) {
+            return Math.sqrt((xB - xA) * (xB - xA) + (yB - yA) * (yB - yA));
+        },
+
+        rad: function (x) {
+            return x * Math.PI / 180;
+        },
+
+        getDistance: function (aLat, aLng, bLat, bLng) {
+            var R = 6378137; // Earth’s mean radius in meter
+            var dLat = this.rad(bLat - aLat);
+            var dLong = this.rad(bLng - aLng);
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(this.rad(aLat)) * Math.cos(this.rad(bLat)) *
+                Math.sin(dLong / 2) * Math.sin(dLong / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var rs = R * c; // returns the distance in meter
+            return (rs / 1000); // km
+        },
+
+        findCenterPoint: function () {
+            var list = this.pointList;
+            var isArray = $.isArray(list);
+            if (!isArray) {
+                return false;
+            }
+
+            var xLeftX, xLeftY, xRightX, xRightY, yTopX, yTopY, yBotX, yBotY;
+            xLeftX = xLeftY = xRightX = xRightY = yTopX = yTopY = yBotX = yBotY = 0;
+
+            $.each(list, function (key, val) {
+                if (key === 0) {
+                    xLeftX = xRightX = yTopX = yBotX = val[0];
+                    xLeftY = xRightY = yTopY = yBotY = val[1];
+                }
+                if (key === 1) {
+                    xRightX = yBotX = val[0];
+                    xRightY = yBotY = val[1];
+                } else {
+                    if (val[0] < xLeftX) {
+                        xLeftX = val[0];
+                        xLeftY = val[1];
+                    }
+
+                    if (xRightX < val[0]) {
+                        xRightX = val[0];
+                        xRightY = val[1];
+                    }
+
+                    if (val[1] > yTopY) {
+                        yTopX = val[0];
+                        yTopY = val[1];
+                    }
+
+                    if (yBotY > val[1]) {
+                        yBotX = val[0];
+                        yBotY = val[1];
+                    }
+                }
+            });
+            var first = this.findMidPoint(xLeftX, xLeftY, xRightX, xRightY);
+            var second = this.findMidPoint(yTopX, yTopY, yBotX, yBotY);
+            return this.findMidPoint(first[0], first[1], second[0], second[1]);
+        }
+    };
+
+    $(document).ready(function () {
+        'use strict';
+        $(window).load(function () {
+            dealerLocator.init();
+            dealerLocator.map.fitBounds(dealerLocator.bounds);
+
+            var d = dealerLocator.calcTwoPoint(50, -76.9635987, 52, -78.840785975); // 1 mid
+            var c = dealerLocator.getDistance(16.0611696, 108.2243396, 16.0612869, 108.230278); // 1 mid
+            console.log(c);
+
+            dealerLocator.findLatLng("185 phan thanh, danang viet nam");
+        });
+
+        $('#change').click(function () {
+            var b = [
+                ['1', 50, -76.9635987],
+                ['2', 50, -78.4831012],
+                ['3', 51, -79.958222],
+                ['mid', 52, -78.840785975]
+            ];
+            dealerLocator.setLocations(b);
+            dealerLocator.setPointList(b);
+            dealerLocator.clearMarkers();
+            dealerLocator.registerMaker();
+        });
+    });
+</script>

@@ -1,0 +1,16 @@
+// object (WC_Order_Item_Product) : $obj["product_id"]
+
+"order_id" => 829
+"name"=> "Claudia Gift Cards"
+"product_id"=> 696
+"variation_id"=> 700
+"quantity"=> 5
+"tax_class"=> ""
+"subtotal"=> 100
+"subtotal_tax"=> "0"
+"total"=> 100
+"total_tax"=>"0"
+"taxes"=> [
+	"total" => [],
+	"subtotal"=> []
+]

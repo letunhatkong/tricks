@@ -47,14 +47,11 @@ NameVirtualHost *:80
     </Directory>
 </VirtualHost>
 
-==== MySQL
+==== MySQL - Create Database 
 
-CREATE DATABASE gg; CREATE USER gg@localhost IDENTIFIED BY '1'; GRANT ALL PRIVILEGES ON gg.* TO gg@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
+CREATE DATABASE stage_vintagewines DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci; CREATE USER stage_vintagewines@localhost IDENTIFIED BY 'stage_vintagewines123!'; GRANT ALL PRIVILEGES ON stage_vintagewines.* TO stage_vintagewines@localhost IDENTIFIED BY 'stage_vintagewines123!'; FLUSH PRIVILEGES;
+
 exit;
-
-CREATE DATABASE test; GRANT ALL PRIVILEGES ON test.* TO test@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
-CREATE DATABASE sewclassic; GRANT ALL PRIVILEGES ON sewclassic.* TO sewclassic@localhost IDENTIFIED BY '1'; FLUSH PRIVILEGES;
-
 
 2/ Download WORDPRESS
 Copy WP to /var/www/html/siva
@@ -68,6 +65,7 @@ sudo find . -type d -exec chmod 755 {} \;
 sudo find . -type f -exec chmod 644 {} \;
 sudo chmod -R 777 wp-content/uploads/
 
+sudo find . -type d -exec chmod 755 {} \; && sudo find . -type f -exec chmod 644 {} \; && sudo chmod -R 777 wp-content/uploads/
 
 <!-- End INSTALL -->
 

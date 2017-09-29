@@ -222,7 +222,7 @@ and in my case it displayed /usr/sbin/node.
 sudo rm /usr/sbin/node
 3. Run: which nodejs
 in my case it displayed /usr/bin/nodejs
-4. Make a link
+4. Make a link: ln -s /from /to
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 OR
 sudo ln -s /usr/bin/nodejs /usr/sbin/node
