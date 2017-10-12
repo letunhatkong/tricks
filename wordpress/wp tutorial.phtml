@@ -51,6 +51,8 @@ NameVirtualHost *:80
 
 CREATE DATABASE stage_vintagewines DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci; CREATE USER stage_vintagewines@localhost IDENTIFIED BY 'stage_vintagewines123!'; GRANT ALL PRIVILEGES ON stage_vintagewines.* TO stage_vintagewines@localhost IDENTIFIED BY 'stage_vintagewines123!'; FLUSH PRIVILEGES;
 
+CREATE DATABASE master_auditair DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci; CREATE USER master_auditair@localhost IDENTIFIED BY 'master_auditair123!'; GRANT ALL PRIVILEGES ON master_auditair.* TO master_auditair@localhost IDENTIFIED BY 'master_auditair123!'; FLUSH PRIVILEGES;
+
 exit;
 
 2/ Download WORDPRESS
@@ -65,7 +67,7 @@ sudo find . -type d -exec chmod 755 {} \;
 sudo find . -type f -exec chmod 644 {} \;
 sudo chmod -R 777 wp-content/uploads/
 
-sudo find . -type d -exec chmod 755 {} \; && sudo find . -type f -exec chmod 644 {} \; && sudo chmod -R 777 wp-content/uploads/
+sudo find . -type d -exec chmod 755 {} \; && sudo find . -type f -exec chmod 644 {} \; && sudo chmod -R 777 wp-content/uploads/ wp-content/cache/
 
 <!-- End INSTALL -->
 

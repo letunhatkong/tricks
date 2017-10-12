@@ -12,6 +12,15 @@ jQuery(document.body).on('updated_wc_div', function() {
 
 <?php // function.php
 
+// Remove calc shipping in cart page. Admin / Shipping options / Disable shipping on cart page
+add_filter( 'woocommerce_cart_ready_to_calc_shipping', 'disable_shipping_calc_on_cart', 99 );
+function disable_shipping_calc_on_cart( $show_shipping ) {
+    if( is_cart() ) {
+        return false;
+    }
+    return $show_shipping;
+}
+
 // Sort cart item by product name
 add_action( 'woocommerce_cart_loaded_from_session', function() {
     global $woocommerce;

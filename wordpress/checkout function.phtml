@@ -34,6 +34,53 @@ $field_label = sprintf( _x( '%s', 'Billing FIELDNAME', 'woocommerce' ), $field['
 // START FUNCTION.PHP
 
 
+
+// ReCalc shipping when state is changed. Same same when country is changed.
+add_filter( 'woocommerce_checkout_fields', 'default_values_checkout_fields' );
+function default_values_checkout_fields( $fields ) {
+    $fields['billing']['billing_state']['class']   = array( 'address-field', 'update_totals_on_change' );
+    $fields['shipping']['shipping_state']['class'] = array( 'address-field', 'update_totals_on_change' );
+
+    return $fields;
+}
+
+// Change shipping price
+add_filter( 'woocommerce_package_rates', 'observer_change_shipping_rate', 100, 2 );
+function observer_change_shipping_rate( $rates, $package ) {
+    global $woocommerce;
+    $c = $woocommerce->customer->get_shipping_country();
+    $s = $woocommerce->customer->get_shipping_state();
+    $cartSubTotal = WC()->cart->subtotal;
+
+    foreach ( $rates as $rate ) {
+        // Canada, Alaska & Hawaii: A flat rate of $10.00 is applied.
+        if ( $c === "CA" || ( $c === "US" && $s === "AK" ) || ( $c === "US" && $s === "HI" ) ) {
+            $rate->cost = 10;
+        } // domestic US
+        else if ( $c === "US" && $s !== "AK" && $s !== "HI" ) {
+            if ( $cartSubTotal <= 100 ) {
+                $rate->cost = 5;
+            } else {
+                $rate->cost  = 0;
+                $rate->label = "Free";
+            }
+        } // international
+        else {
+            if ( 0 < $cartSubTotal && $cartSubTotal < 100 ) {
+                $rate->cost = 25;
+            } else if ( 100 <= $cartSubTotal && $cartSubTotal < 200 ) {
+                $rate->cost = 35;
+            } else {
+                $rate->cost = 45;
+            }
+        }
+        //Set the TAX
+        //$rate->taxes[1] = 1000 * 0.2;
+    }
+
+    return $rates;
+}
+
 // Set default stage, country, and zipcode
 // describe in woocommerce/includes/class-wc-deprecaed-filter-hooks.php
 add_filter( 'default_checkout_country', 'xa_set_default_checkout_country' );

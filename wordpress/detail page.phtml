@@ -2,7 +2,21 @@
 
 <!-- Related product -->
 is call in plugin/woocommerce/includes/wc-product-function.php function woocommerce_related_products()
+or woocommerce_output_related_products() in plugin/woocommerce/includes/wc-template-function.php
 Default it will get 4 items with random.
+
+<!-- Remove footer, header in detail page -->
+Way 1: Create blank files your-theme/header.php and your-theme/footer.php
+Way 2: remove get_header( 'shop' ); get_footer( 'shop' ); in woocommerce/single.product.php
+
+<!-- Add description in detail - in woocommerce/single-product/short-description.php
+    Remove return; and change post_excerpt to post_content   -->
+<div class="woocommerce-product-details__short-description">
+    <?= apply_filters( 'woocommerce_short_description', $post->post_content ); ?>
+</div>
+
+<!-- Edit add to cart form in detail page - Single product -->
+Edit file woocommerce/single-product/add-to-cart/simple.php
 
 <!-- Get tags of product -->
 <?php 
@@ -29,8 +43,24 @@ echo strip_tags( $tags ); // remove links, only strings
 <?php
 // START FUNCTION.PHP
 
+// Remove Related product
+remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+
 // remove breadcrumb in detail page 
 remove_action( 'woocommerce_before_main_content','woocommerce_breadcrumb', 20);
+
+// remove breadcrumb 2
+add_action( 'woocommerce_before_main_content', 'woo_remove_breadcrumb' );
+function woo_remove_breadcrumb() {
+    remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
+}
+
+// Move breadcrumb. Require remove bredcrumb first
+// add_action( 'woo_custom_breadcrumb', 'woocommerce_custom_breadcrumb' );
+function woocommerce_custom_breadcrumb(){
+    woocommerce_breadcrumb();
+}
+// Then add do_action('woo_custom_breadcrumb'); where you want
 
 // Remove tab content in product detail page
 remove_action( 'woocommerce_after_single_product_summary','woocommerce_output_product_data_tabs', 10 );

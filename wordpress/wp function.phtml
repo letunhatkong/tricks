@@ -1,4 +1,5 @@
 
+
 <!-- Create template for a static page -->
 in root theme folder, create file page-slugPage.php
 
@@ -192,7 +193,11 @@ $args = array(
     'tax_query'      => $tax_query
 );
 $loop = new WP_Query( $args );
-
+if ( $loop->have_posts() ) {
+    while ( $loop->have_posts() ) : $loop->the_post();
+        wc_get_template_part( 'content', 'product' );
+    endwhile;
+} 
 
 // Query both meta_query and tax_query
 $args = array(
@@ -217,6 +222,57 @@ $args = array(
             'operator' => 'IN'
         ]
     )
+);
+
+// Query miYim
+$args = array(
+    'post_type'      => 'product',
+    'status'         => 'publish',
+    'posts_per_page' => 12,
+    'tax_query'      => [
+        'relation' => "AND",
+//          [
+//              'taxonomy' => 'product_cat',
+//              'field'    => 'slug',
+//              'terms'    => array( 'blankie-baby', 'stick-rattle' ),
+//              'operator' => 'IN'
+//          ],
+//          [
+//              'taxonomy' => 'product_animal',
+//              'field'    => 'slug',
+//              'terms'    => array( 'elephant' ),
+//              'operator' => 'IN'
+//          ],
+//          [
+//              'taxonomy' => 'product_color',
+//              'field'    => 'slug',
+//              'terms'    => array( 'pink'),
+//              'operator' => 'IN'
+//          ],
+        [
+            'taxonomy' => 'product_age',
+            'field'    => 'slug',
+            'terms'    => array( 'baby', "toddler"),
+            'operator' => 'IN'
+        ]
+    ],
+//      'orderby' => 'meta_value_num',
+//      'order'  => 'DESC', // default is DESC
+//      'meta_key' => '_price'
+
+//        'orderby' => 'title',
+//      'order'  => 'ASC', // default is DESC
+
+    // filter by price range
+    'orderby'        => 'meta_value_num',
+    'meta_query'     => array(
+        array(
+            'key'     => '_price',
+            'value'   => 30, // array(15 30), 31
+            'compare' => '>', // between, >=
+            'type'    => 'NUMERIC'
+        ),
+    ),
 );
 
 // Get data after query
@@ -296,6 +352,10 @@ echo $thumb_url[0];
 $imgUrl = get_the_post_thumbnail_url();
 the_post_thumbnail_url();
 wp_get_attachment_url( $attachment_id );
+
+// Get hinh goc from product
+$image = wp_get_attachment_image_src( get_post_thumbnail_id( $product->ID ), 'single-post-thumbnail' );
+echo $image[0];
 
 // Add custom size in function.php and call
 add_theme_support( 'grid-card-thumbnail', 'post' );
